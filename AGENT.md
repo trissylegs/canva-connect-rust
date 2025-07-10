@@ -25,6 +25,7 @@
 - `./scripts/setup.sh` - One-time setup script for development environment
 - `./scripts/check.sh` - Run all CI checks locally (formatting, clippy, tests, build)
 - `./scripts/fix.sh` - Auto-fix formatting and clippy issues
+- `./scripts/docs.sh` - Generate Rust documentation (use `--open` to open in browser)
 - `./scripts/pre-commit.sh` - Pre-commit hook logic (version controlled)
 - **Pre-commit hook**: Automatically runs all CI checks before each commit
 

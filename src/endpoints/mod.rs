@@ -17,7 +17,7 @@
 //!
 //! ## Usage
 //!
-//! Access endpoints through the main [`Client`](crate::Client):
+//! Access endpoints through the main [`Client`]:
 //!
 //! ```rust,no_run
 //! use canva_connect::{Client, auth::AccessToken};
