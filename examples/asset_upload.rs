@@ -1,12 +1,14 @@
 //! Example: Upload an asset to Canva Connect API
 //!
 //! This example demonstrates how to upload an image asset to the Canva Connect API.
-//! You'll need a valid access token from your Canva app to run this example.
 //!
-//! Usage:
-//! ```bash
-//! cargo run --example asset_upload -- --token YOUR_ACCESS_TOKEN --file path/to/image.png
-//! ```
+//! Setup:
+//! 1. Copy .env.example to .env
+//! 2. Set CANVA_ACCESS_TOKEN in .env file
+//! 3. Optionally set EXAMPLE_FILE_PATH in .env file
+//! 4. Run: cargo run --example asset_upload
+//!
+//! Alternative: cargo run --example asset_upload -- --token YOUR_ACCESS_TOKEN --file path/to/image.png
 
 use canva_connect::{
     auth::AccessToken,
@@ -19,53 +21,61 @@ use std::path::Path;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Parse command line arguments
-    let args: Vec<String> = env::args().collect();
+    // Load environment variables from .env file
+    dotenv::dotenv().ok();
     
-    // Simple argument parsing
-    let mut access_token = None;
-    let mut file_path = None;
-    
-    let mut i = 1;
-    while i < args.len() {
-        match args[i].as_str() {
-            "--token" => {
-                if i + 1 < args.len() {
-                    access_token = Some(args[i + 1].clone());
-                    i += 2;
-                } else {
-                    eprintln!("Error: --token requires a value");
-                    std::process::exit(1);
-                }
+    // Get access token from .env file or command line arguments
+    let access_token = if let Ok(token) = env::var("CANVA_ACCESS_TOKEN") {
+        token
+    } else {
+        // Fallback to command line parsing
+        let args: Vec<String> = env::args().collect();
+        
+        let mut access_token = None;
+        let mut i = 1;
+        while i < args.len() {
+            if args[i] == "--token" && i + 1 < args.len() {
+                access_token = Some(args[i + 1].clone());
+                break;
             }
-            "--file" => {
-                if i + 1 < args.len() {
-                    file_path = Some(args[i + 1].clone());
-                    i += 2;
-                } else {
-                    eprintln!("Error: --file requires a value");
-                    std::process::exit(1);
-                }
-            }
-            _ => {
-                eprintln!("Unknown argument: {}", args[i]);
-                std::process::exit(1);
-            }
+            i += 1;
         }
-    }
+        
+        access_token.unwrap_or_else(|| {
+            eprintln!("Error: Access token not found.");
+            eprintln!("Please either:");
+            eprintln!("1. Set CANVA_ACCESS_TOKEN in .env file, or");
+            eprintln!("2. Use: cargo run --example asset_upload -- --token YOUR_ACCESS_TOKEN --file path/to/image.png");
+            std::process::exit(1);
+        })
+    };
 
-    // Check for required arguments
-    let access_token = access_token.unwrap_or_else(|| {
-        eprintln!("Error: --token is required");
-        eprintln!("Usage: cargo run --example asset_upload -- --token YOUR_ACCESS_TOKEN --file path/to/image.png");
-        std::process::exit(1);
-    });
-
-    let file_path = file_path.unwrap_or_else(|| {
-        eprintln!("Error: --file is required");
-        eprintln!("Usage: cargo run --example asset_upload -- --token YOUR_ACCESS_TOKEN --file path/to/image.png");
-        std::process::exit(1);
-    });
+    // Get file path from .env file, command line arguments, or prompt
+    let file_path = if let Ok(path) = env::var("EXAMPLE_FILE_PATH") {
+        path
+    } else {
+        // Parse command line arguments for file path
+        let args: Vec<String> = env::args().collect();
+        
+        let mut file_path = None;
+        let mut i = 1;
+        while i < args.len() {
+            if args[i] == "--file" && i + 1 < args.len() {
+                file_path = Some(args[i + 1].clone());
+                break;
+            }
+            i += 1;
+        }
+        
+        file_path.unwrap_or_else(|| {
+            eprintln!("Error: File path not found.");
+            eprintln!("Please either:");
+            eprintln!("1. Set EXAMPLE_FILE_PATH in .env file, or");
+            eprintln!("2. Use: cargo run --example asset_upload -- --file path/to/image.png");
+            eprintln!("3. Use: cargo run --example asset_upload -- --token YOUR_ACCESS_TOKEN --file path/to/image.png");
+            std::process::exit(1);
+        })
+    };
 
     // Create the client
     let client = Client::new(AccessToken::new(access_token));

@@ -159,7 +159,33 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ## Running Examples
 
-This crate includes several examples:
+This crate includes several examples that demonstrate how to use the library.
+
+### Setup
+
+1. **Copy the environment template:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Configure your API credentials in `.env`:**
+   ```env
+   CANVA_ACCESS_TOKEN=your_access_token_here
+   EXAMPLE_FILE_PATH=path/to/your/test/image.png
+   ```
+
+3. **Run the examples:**
+   ```bash
+   # Basic usage example (URL upload and listing)
+   cargo run --example basic_usage
+   
+   # Asset upload example (file upload)
+   cargo run --example asset_upload
+   ```
+
+### Alternative: Command Line Arguments
+
+You can also run examples with command line arguments instead of using `.env`:
 
 ```bash
 # Basic usage example

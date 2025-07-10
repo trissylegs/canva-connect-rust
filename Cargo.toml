@@ -39,6 +39,7 @@ urlencoding = "2.1"
 tokio-test = "0.4"
 mockito = "1.2"
 serde_test = "1.0"
+dotenv = "0.15"
 
 [features]
 default = ["rustls-tls"]

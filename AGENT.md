@@ -11,8 +11,11 @@
 - `cargo build` - Build the library
 - `cargo test` - Run unit tests
 - `cargo doc` - Generate documentation
-- `cargo run --example basic_usage -- --token TOKEN` - Run basic usage example
-- `cargo run --example asset_upload -- --token TOKEN --file path/to/file` - Run asset upload example
+- `cp .env.example .env` - Set up environment configuration
+- `cargo run --example basic_usage` - Run basic usage example (needs .env setup)
+- `cargo run --example asset_upload` - Run asset upload example (needs .env setup)
+- `cargo run --example basic_usage -- --token TOKEN` - Run with CLI args instead of .env
+- `cargo run --example asset_upload -- --token TOKEN --file path/to/file` - Run with CLI args
 
 ## Codebase Structure
 - `src/lib.rs` - Main library entry point

@@ -5,10 +5,12 @@
 //! - Uploading an asset from a URL
 //! - Listing assets
 //!
-//! Usage:
-//! ```bash
-//! cargo run --example basic_usage -- --token YOUR_ACCESS_TOKEN
-//! ```
+//! Setup:
+//! 1. Copy .env.example to .env
+//! 2. Set CANVA_ACCESS_TOKEN in .env file
+//! 3. Run: cargo run --example basic_usage
+//!
+//! Alternative: cargo run --example basic_usage -- --token YOUR_ACCESS_TOKEN
 
 use canva_connect::{
     auth::AccessToken,
@@ -20,14 +22,24 @@ use std::env;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Parse access token from command line arguments
-    let args: Vec<String> = env::args().collect();
+    // Load environment variables from .env file
+    dotenv::dotenv().ok();
     
-    let access_token = if args.len() > 2 && args[1] == "--token" {
-        args[2].clone()
+    // Get access token from .env file or command line arguments
+    let access_token = if let Ok(token) = env::var("CANVA_ACCESS_TOKEN") {
+        token
     } else {
-        eprintln!("Usage: cargo run --example basic_usage -- --token YOUR_ACCESS_TOKEN");
-        std::process::exit(1);
+        // Fallback to command line arguments
+        let args: Vec<String> = env::args().collect();
+        if args.len() > 2 && args[1] == "--token" {
+            args[2].clone()
+        } else {
+            eprintln!("Error: Access token not found.");
+            eprintln!("Please either:");
+            eprintln!("1. Set CANVA_ACCESS_TOKEN in .env file, or");
+            eprintln!("2. Use: cargo run --example basic_usage -- --token YOUR_ACCESS_TOKEN");
+            std::process::exit(1);
+        }
     };
 
     // Create the client
