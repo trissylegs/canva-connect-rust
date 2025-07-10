@@ -104,7 +104,7 @@ impl fmt::Display for Scope {
             Scope::FolderWrite => "folder:write",
             Scope::ProfileRead => "profile:read",
         };
-        write!(f, "{}", scope_str)
+        write!(f, "{scope_str}")
     }
 }
 
@@ -228,8 +228,7 @@ impl OAuthClient {
         } else {
             let error_text = response.text().await?;
             Err(Error::Auth(format!(
-                "Token exchange failed: {}",
-                error_text
+                "Token exchange failed: {error_text}"
             )))
         }
     }

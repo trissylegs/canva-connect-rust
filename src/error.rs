@@ -87,7 +87,7 @@ impl fmt::Display for ApiErrorCode {
             ApiErrorCode::TooManyRequests => write!(f, "TOO_MANY_REQUESTS"),
             ApiErrorCode::InternalServerError => write!(f, "INTERNAL_SERVER_ERROR"),
             ApiErrorCode::ServiceUnavailable => write!(f, "SERVICE_UNAVAILABLE"),
-            ApiErrorCode::Unknown(code) => write!(f, "{}", code),
+            ApiErrorCode::Unknown(code) => write!(f, "{code}"),
         }
     }
 }

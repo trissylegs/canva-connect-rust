@@ -181,7 +181,7 @@ impl Client {
         }
 
         // Fallback to generic HTTP error
-        Err(Error::Generic(format!("HTTP {} error", status)))
+        Err(Error::Generic(format!("HTTP {status} error")))
     }
 
     /// Get a JSON response from a path

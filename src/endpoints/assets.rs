@@ -35,10 +35,10 @@ impl AssetsApi {
                 ));
             }
             if let Some(ownership) = opts.ownership {
-                query_params.push(format!("ownership={}", ownership));
+                query_params.push(format!("ownership={ownership}"));
             }
             if let Some(sort_by) = opts.sort_by {
-                query_params.push(format!("sort_by={}", sort_by));
+                query_params.push(format!("sort_by={sort_by}"));
             }
 
             if !query_params.is_empty() {
@@ -52,21 +52,21 @@ impl AssetsApi {
 
     /// Get a specific asset by ID
     pub async fn get(&self, asset_id: &str) -> Result<Asset> {
-        let path = format!("/v1/assets/{}", asset_id);
+        let path = format!("/v1/assets/{asset_id}");
         let response: GetAssetResponse = self.client.get_json(&path).await?;
         Ok(response.asset)
     }
 
     /// Update an asset
     pub async fn update(&self, asset_id: &str, request: UpdateAssetRequest) -> Result<Asset> {
-        let path = format!("/v1/assets/{}", asset_id);
+        let path = format!("/v1/assets/{asset_id}");
         let response: UpdateAssetResponse = self.client.post_json(&path, &request).await?;
         Ok(response.asset)
     }
 
     /// Delete an asset
     pub async fn delete(&self, asset_id: &str) -> Result<()> {
-        let path = format!("/v1/assets/{}", asset_id);
+        let path = format!("/v1/assets/{asset_id}");
         self.client.delete(&path).await?;
         Ok(())
     }
@@ -88,7 +88,7 @@ impl AssetsApi {
 
     /// Get the status of an asset upload job
     pub async fn get_upload_job(&self, job_id: &str) -> Result<crate::models::AssetUploadJob> {
-        let path = format!("/v1/asset-uploads/{}", job_id);
+        let path = format!("/v1/asset-uploads/{job_id}");
         let response: crate::models::AssetUploadJobResponse = self.client.get_json(&path).await?;
         Ok(response.job)
     }
@@ -107,7 +107,7 @@ impl AssetsApi {
 
     /// Get the status of a URL asset upload job
     pub async fn get_url_upload_job(&self, job_id: &str) -> Result<crate::models::AssetUploadJob> {
-        let path = format!("/v1/url-asset-uploads/{}", job_id);
+        let path = format!("/v1/url-asset-uploads/{job_id}");
         let response: crate::models::AssetUploadJobResponse = self.client.get_json(&path).await?;
         Ok(response.job)
     }
