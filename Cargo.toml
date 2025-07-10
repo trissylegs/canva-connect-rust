@@ -63,3 +63,7 @@ path = "examples/asset_upload.rs"
 [[example]]
 name = "observability"
 path = "examples/observability.rs"
+
+[[example]]
+name = "url_asset_upload"
+path = "examples/url_asset_upload.rs"

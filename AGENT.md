@@ -14,9 +14,11 @@
 - `cargo doc` - Generate documentation
 - `cp .env.example .env` - Set up environment configuration
 - `cargo run --example asset_upload` - Run asset upload example (needs .env setup)
+- `cargo run --example url_asset_upload` - Run URL asset upload example (needs .env setup)
 - `cargo run --example user_profile` - Run user profile example (needs .env setup)
 - `cargo run --example observability --features observability` - Run observability example with tracing
 - `cargo run --example asset_upload -- --token TOKEN --file path/to/file` - Run with CLI args
+- `cargo run --example url_asset_upload -- --url "https://example.com/image.jpg"` - Run with CLI args
 - `cargo run --example user_profile -- --token TOKEN` - Run with CLI args
 
 ## Development Scripts
