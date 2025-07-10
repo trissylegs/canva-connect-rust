@@ -218,6 +218,17 @@ impl Client {
         Ok(json)
     }
 
+    /// Patch JSON and get JSON response
+    pub async fn patch_json<T: serde::Serialize, R: serde::de::DeserializeOwned>(
+        &self,
+        path: &str,
+        body: &T,
+    ) -> Result<R> {
+        let response = self.patch(path, body).await?;
+        let json = response.json().await?;
+        Ok(json)
+    }
+
     /// Upload a file as multipart form data
     pub async fn upload_file(
         &self,

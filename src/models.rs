@@ -3,17 +3,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-/// Common pagination response structure
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PaginatedResponse<T> {
-    /// List of items
-    pub items: Vec<T>,
-    /// Continuation token for pagination
-    pub continuation: Option<String>,
-    /// Whether there are more items
-    pub has_more: bool,
-}
-
 /// Asset metadata
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Asset {
@@ -403,36 +392,6 @@ pub struct ExportUrl {
 pub struct AutofillResult {
     /// Created design
     pub design: Design,
-}
-
-/// Ownership filter
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum OwnershipType {
-    /// Owned by user
-    Owned,
-    /// Shared with user
-    Shared,
-    /// All accessible items
-    All,
-}
-
-/// Sort order
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum SortByType {
-    /// Sort by creation date (newest first)
-    CreatedDescending,
-    /// Sort by creation date (oldest first)
-    CreatedAscending,
-    /// Sort by last modified date (newest first)
-    ModifiedDescending,
-    /// Sort by last modified date (oldest first)
-    ModifiedAscending,
-    /// Sort by name (A-Z)
-    NameAscending,
-    /// Sort by name (Z-A)
-    NameDescending,
 }
 
 /// Dataset filter

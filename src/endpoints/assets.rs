@@ -1,4 +1,27 @@
-//! Assets API endpoints
+//! Assets API endpoints for the Canva Connect API.
+//!
+//! This module provides access to asset management operations including:
+//! - Getting asset metadata
+//! - Updating asset properties (name and tags)
+//! - Deleting assets
+//! - Creating asset upload jobs
+//! - Managing URL-based asset uploads
+//!
+//! ## Available Operations
+//!
+//! - [`get`](AssetsApi::get) - Get metadata for a specific asset
+//! - [`update`](AssetsApi::update) - Update asset name and tags
+//! - [`delete`](AssetsApi::delete) - Delete an asset (moves to trash)
+//! - [`create_upload_job`](AssetsApi::create_upload_job) - Upload asset from binary data
+//! - [`create_url_upload_job`](AssetsApi::create_url_upload_job) - Upload asset from URL
+//! - [`get_upload_job`](AssetsApi::get_upload_job) - Check upload job status
+//! - [`wait_for_upload_job`](AssetsApi::wait_for_upload_job) - Wait for upload completion
+//!
+//! ## Note on Asset Listing
+//!
+//! The Canva Connect API does not provide a general asset listing endpoint.
+//! Assets are typically accessed through other endpoints like designs or
+//! by their specific asset IDs.
 
 use crate::{client::Client, error::Result, models::*};
 use serde::{Deserialize, Serialize};
@@ -15,41 +38,6 @@ impl AssetsApi {
         Self { client }
     }
 
-    /// List assets with optional filtering and pagination
-    pub async fn list(
-        &self,
-        options: Option<ListAssetsOptions>,
-    ) -> Result<PaginatedResponse<Asset>> {
-        let mut path = "/v1/assets".to_string();
-
-        if let Some(opts) = options {
-            let mut query_params = Vec::new();
-
-            if let Some(query) = opts.query {
-                query_params.push(format!("query={}", urlencoding::encode(&query)));
-            }
-            if let Some(continuation) = opts.continuation {
-                query_params.push(format!(
-                    "continuation={}",
-                    urlencoding::encode(&continuation)
-                ));
-            }
-            if let Some(ownership) = opts.ownership {
-                query_params.push(format!("ownership={ownership}"));
-            }
-            if let Some(sort_by) = opts.sort_by {
-                query_params.push(format!("sort_by={sort_by}"));
-            }
-
-            if !query_params.is_empty() {
-                path.push('?');
-                path.push_str(&query_params.join("&"));
-            }
-        }
-
-        self.client.get_json(&path).await
-    }
-
     /// Get a specific asset by ID
     pub async fn get(&self, asset_id: &str) -> Result<Asset> {
         let path = format!("/v1/assets/{asset_id}");
@@ -57,10 +45,10 @@ impl AssetsApi {
         Ok(response.asset)
     }
 
-    /// Update an asset
+    /// Update an asset (name and tags)
     pub async fn update(&self, asset_id: &str, request: UpdateAssetRequest) -> Result<Asset> {
         let path = format!("/v1/assets/{asset_id}");
-        let response: UpdateAssetResponse = self.client.post_json(&path, &request).await?;
+        let response: UpdateAssetResponse = self.client.patch_json(&path, &request).await?;
         Ok(response.asset)
     }
 
@@ -165,19 +153,6 @@ impl AssetsApi {
     }
 }
 
-/// Options for listing assets
-#[derive(Debug, Clone, Default)]
-pub struct ListAssetsOptions {
-    /// Search query
-    pub query: Option<String>,
-    /// Continuation token for pagination
-    pub continuation: Option<String>,
-    /// Ownership filter
-    pub ownership: Option<OwnershipType>,
-    /// Sort order
-    pub sort_by: Option<SortByType>,
-}
-
 /// Asset upload metadata
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AssetUploadMetadata {
@@ -229,27 +204,4 @@ pub struct GetAssetResponse {
 pub struct UpdateAssetResponse {
     /// The updated asset
     pub asset: Asset,
-}
-
-impl std::fmt::Display for OwnershipType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            OwnershipType::Owned => write!(f, "owned"),
-            OwnershipType::Shared => write!(f, "shared"),
-            OwnershipType::All => write!(f, "all"),
-        }
-    }
-}
-
-impl std::fmt::Display for SortByType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            SortByType::CreatedDescending => write!(f, "created_descending"),
-            SortByType::CreatedAscending => write!(f, "created_ascending"),
-            SortByType::ModifiedDescending => write!(f, "modified_descending"),
-            SortByType::ModifiedAscending => write!(f, "modified_ascending"),
-            SortByType::NameAscending => write!(f, "name_ascending"),
-            SortByType::NameDescending => write!(f, "name_descending"),
-        }
-    }
 }
