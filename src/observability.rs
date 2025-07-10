@@ -1,7 +1,9 @@
 //! Observability support for the Canva Connect client.
 //!
 //! This module provides OpenTelemetry integration for tracing API requests
-//! and monitoring client performance. Enable observability features by
+//! and monitoring client performance. All HTTP requests are automatically
+//! instrumented with spans that include request metadata, response status,
+//! and Canva API request IDs for correlation. Enable observability features by
 //! adding the `observability` feature flag.
 //!
 //! ## Setup

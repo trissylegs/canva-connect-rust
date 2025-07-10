@@ -75,6 +75,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("📊 Observability Information:");
         println!("   • All API calls have been traced with OpenTelemetry");
         println!("   • HTTP requests include spans with method, URL, status code");
+        println!("   • Canva API request IDs are captured for correlation");
         println!("   • Asset operations include file size and name metadata");
         println!("   • Check your tracing backend for detailed trace data");
         println!("   • Jaeger UI: http://localhost:16686 (if using local Jaeger)");
@@ -164,6 +165,7 @@ async fn demonstrate_asset_apis(client: &Client) -> Result<(), Box<dyn std::erro
     println!("   💡 The above API calls were traced and include:");
     println!("      • HTTP method and URL");
     println!("      • Response status codes");
+    println!("      • Canva API request IDs (x-request-id header)");
     println!("      • Request duration");
     println!("      • Custom metadata (asset names, file sizes, etc.)");
 

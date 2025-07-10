@@ -162,6 +162,7 @@ impl Client {
             http.url = %format!("{}{}", self.base_url, path),
             http.status_code = tracing::field::Empty,
             canva.api.path = path,
+            canva.request_id = tracing::field::Empty,
         )
     ))]
     pub async fn request<T: serde::Serialize>(
@@ -185,9 +186,19 @@ impl Client {
 
         let response = request.send().await?;
 
-        // Record response status in span
+        // Record response status and request ID in span
         #[cfg(feature = "observability")]
-        tracing::Span::current().record("http.status_code", response.status().as_u16());
+        {
+            tracing::Span::current().record("http.status_code", response.status().as_u16());
+
+            // Capture x-request-id header for tracing correlation
+            if let Some(request_id) = response.headers().get("x-request-id") {
+                if let Ok(request_id_str) = request_id.to_str() {
+                    tracing::Span::current().record("canva.request_id", request_id_str);
+                    tracing::debug!("Canva API request ID: {}", request_id_str);
+                }
+            }
+        }
 
         // Update rate limit info from headers
         let _rate_limit_info = RateLimitInfo::from_headers(response.headers());
@@ -195,7 +206,18 @@ impl Client {
         // Handle API errors
         if !response.status().is_success() {
             #[cfg(feature = "observability")]
-            tracing::warn!("HTTP request failed with status: {}", response.status());
+            {
+                let request_id = response
+                    .headers()
+                    .get("x-request-id")
+                    .and_then(|v| v.to_str().ok())
+                    .unwrap_or("unknown");
+                tracing::warn!(
+                    "HTTP request failed with status: {} (request_id: {})",
+                    response.status(),
+                    request_id
+                );
+            }
             return self.handle_error_response(response).await;
         }
 
