@@ -26,7 +26,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let access_token = env::var("CANVA_ACCESS_TOKEN").unwrap_or_else(|_| {
         eprintln!("Error: CANVA_ACCESS_TOKEN not found in environment.");
         eprintln!("Please set CANVA_ACCESS_TOKEN in .env file.");
-        eprintln!("For security reasons, tokens should not be passed via command line.");
         std::process::exit(1);
     });
 

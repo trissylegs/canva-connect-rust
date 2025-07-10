@@ -201,8 +201,6 @@ cargo run --example asset_upload -- --file path/to/image.png
 cargo run --example url_asset_upload -- --url "https://example.com/image.png"
 ```
 
-**Security Note:** Access tokens should only be provided via `.env` files, never as command line arguments.
-
 ## API Coverage
 
 Currently implemented endpoints:
