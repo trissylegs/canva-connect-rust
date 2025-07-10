@@ -227,9 +227,7 @@ impl OAuthClient {
             Ok(token_response)
         } else {
             let error_text = response.text().await?;
-            Err(Error::Auth(format!(
-                "Token exchange failed: {error_text}"
-            )))
+            Err(Error::Auth(format!("Token exchange failed: {error_text}")))
         }
     }
 }
