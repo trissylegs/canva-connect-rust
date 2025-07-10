@@ -191,21 +191,17 @@ This crate includes several examples that demonstrate how to use the library.
 
 ### Alternative: Command Line Arguments
 
-You can also run examples with command line arguments instead of using `.env`:
+Some examples support additional command line arguments:
 
 ```bash
-# User profile example
-cargo run --example user_profile -- --token YOUR_ACCESS_TOKEN
+# Upload asset from file (with custom file path)
+cargo run --example asset_upload -- --file path/to/image.png
 
-# Upload asset from file
-cargo run --example asset_upload -- --token YOUR_ACCESS_TOKEN --file path/to/image.png
-
-# Upload asset from URL
-cargo run --example url_asset_upload -- --token YOUR_ACCESS_TOKEN --url "https://example.com/image.png"
-
-# Design management
-cargo run --example designs -- --token YOUR_ACCESS_TOKEN
+# Upload asset from URL (with custom URL)
+cargo run --example url_asset_upload -- --url "https://example.com/image.png"
 ```
+
+**Security Note:** Access tokens should only be provided via `.env` files, never as command line arguments.
 
 ## API Coverage
 

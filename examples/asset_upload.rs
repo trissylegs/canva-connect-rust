@@ -8,7 +8,7 @@
 //! 3. Optionally set EXAMPLE_FILE_PATH in .env file
 //! 4. Run: cargo run --example asset_upload
 //!
-//! Alternative: cargo run --example asset_upload -- --token YOUR_ACCESS_TOKEN --file path/to/image.png
+//! Alternative: cargo run --example asset_upload -- --file path/to/image.png
 
 use canva_connect::{auth::AccessToken, endpoints::assets::AssetUploadMetadata, Client};
 use std::env;
@@ -20,31 +20,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load environment variables from .env file
     dotenv::dotenv().ok();
 
-    // Get access token from .env file or command line arguments
-    let access_token = if let Ok(token) = env::var("CANVA_ACCESS_TOKEN") {
-        token
-    } else {
-        // Fallback to command line parsing
-        let args: Vec<String> = env::args().collect();
-
-        let mut access_token = None;
-        let mut i = 1;
-        while i < args.len() {
-            if args[i] == "--token" && i + 1 < args.len() {
-                access_token = Some(args[i + 1].clone());
-                break;
-            }
-            i += 1;
-        }
-
-        access_token.unwrap_or_else(|| {
-            eprintln!("Error: Access token not found.");
-            eprintln!("Please either:");
-            eprintln!("1. Set CANVA_ACCESS_TOKEN in .env file, or");
-            eprintln!("2. Use: cargo run --example asset_upload -- --token YOUR_ACCESS_TOKEN --file path/to/image.png");
-            std::process::exit(1);
-        })
-    };
+    // Get access token from .env file
+    let access_token = env::var("CANVA_ACCESS_TOKEN").unwrap_or_else(|_| {
+        eprintln!("Error: CANVA_ACCESS_TOKEN not found in environment.");
+        eprintln!("Please set CANVA_ACCESS_TOKEN in .env file.");
+        eprintln!("For security reasons, tokens should not be passed via command line.");
+        std::process::exit(1);
+    });
 
     // Get file path from .env file, command line arguments, or prompt
     let file_path = if let Ok(path) = env::var("EXAMPLE_FILE_PATH") {
@@ -68,7 +50,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             eprintln!("Please either:");
             eprintln!("1. Set EXAMPLE_FILE_PATH in .env file, or");
             eprintln!("2. Use: cargo run --example asset_upload -- --file path/to/image.png");
-            eprintln!("3. Use: cargo run --example asset_upload -- --token YOUR_ACCESS_TOKEN --file path/to/image.png");
             std::process::exit(1);
         })
     };

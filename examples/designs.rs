@@ -10,7 +10,7 @@
 //! 2. Set CANVA_ACCESS_TOKEN in .env file with appropriate scopes
 //! 3. Run: cargo run --example designs
 //!
-//! Alternative: cargo run --example designs -- --token YOUR_ACCESS_TOKEN
+//! (Only uses .env file for security)
 //!
 //! Required scopes:
 //! - design:meta:read for listing and getting design metadata
@@ -30,31 +30,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load environment variables from .env file
     dotenv::dotenv().ok();
 
-    // Get access token from .env file or command line arguments
-    let access_token = if let Ok(token) = env::var("CANVA_ACCESS_TOKEN") {
-        token
-    } else {
-        // Fallback to command line parsing
-        let args: Vec<String> = env::args().collect();
-
-        let mut access_token = None;
-        let mut i = 1;
-        while i < args.len() {
-            if args[i] == "--token" && i + 1 < args.len() {
-                access_token = Some(args[i + 1].clone());
-                break;
-            }
-            i += 1;
-        }
-
-        access_token.unwrap_or_else(|| {
-            eprintln!("Error: Access token not found.");
-            eprintln!("Please either:");
-            eprintln!("1. Set CANVA_ACCESS_TOKEN in .env file, or");
-            eprintln!("2. Use: cargo run --example designs -- --token YOUR_ACCESS_TOKEN");
-            std::process::exit(1);
-        })
-    };
+    // Get access token from .env file
+    let access_token = env::var("CANVA_ACCESS_TOKEN").unwrap_or_else(|_| {
+        eprintln!("Error: CANVA_ACCESS_TOKEN not found in environment.");
+        eprintln!("Please set CANVA_ACCESS_TOKEN in .env file.");
+        eprintln!("For security reasons, tokens should not be passed via command line.");
+        std::process::exit(1);
+    });
 
     // Create client
     let client = Client::new(AccessToken::new(access_token));

@@ -19,10 +19,8 @@
 - `cargo run --example user_profile` - Run user profile example (needs .env setup)
 - `cargo run --example designs` - Run design API example (needs .env setup)
 - `cargo run --example observability --features observability` - Run observability example with tracing
-- `cargo run --example asset_upload -- --token TOKEN --file path/to/file` - Run with CLI args
-- `cargo run --example url_asset_upload -- --url "https://rustacean.net/assets/rustacean-flat-happy.png"` - Run with CLI args
-- `cargo run --example user_profile -- --token TOKEN` - Run with CLI args
-- `cargo run --example designs -- --token TOKEN` - Run with CLI args
+- `cargo run --example asset_upload -- --file path/to/file` - Run with custom file path
+- `cargo run --example url_asset_upload -- --url "https://rustacean.net/assets/rustacean-flat-happy.png"` - Run with custom URL
 
 ## Integration Tests
 Integration tests make real API calls to Canva Connect and require valid credentials:
