@@ -21,9 +21,13 @@
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     let client = Client::new(AccessToken::new("your-access-token"));
 //!     
-//!     // List the user's designs
-//!     let designs = client.designs().list().await?;
-//!     println!("Found {} designs", designs.items.len());
+//!     // Create an asset upload job
+//!     let metadata = canva_connect::endpoints::assets::AssetUploadMetadata::new(
+//!         "my-image.png", 
+//!         vec!["design".to_string()]
+//!     );
+//!     let upload_job = client.assets().create_upload_job(vec![], metadata).await?;
+//!     println!("Created upload job: {}", upload_job.id);
 //!     
 //!     Ok(())
 //! }

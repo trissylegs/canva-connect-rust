@@ -313,7 +313,7 @@ pub enum ExportQuality {
 }
 
 /// Job status
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum JobStatus {
     /// Job is in progress
     #[serde(rename = "in_progress")]
