@@ -43,9 +43,11 @@ Integration tests make real API calls to Canva Connect and require valid credent
 - `test_url_asset_upload_workflow` - Test complete asset upload workflow
 - `test_asset_error_handling` - Test asset API error handling
 - `test_list_designs` - Test design listing with filters
-- `test_create_and_get_design` - Test design creation and retrieval
-- `test_create_custom_design` - Test custom dimension design creation
+- `test_create_and_get_design` - Test design creation and retrieval (⚠️ creates designs that cannot be deleted)
+- `test_create_custom_design` - Test custom dimension design creation (⚠️ creates designs that cannot be deleted)
 - `test_design_error_handling` - Test design API error handling
+
+**Note**: The Canva Connect API does not provide an endpoint to delete designs, so integration tests that create designs will leave them in the user's account. Asset tests automatically clean up created assets.
 
 ## Development Scripts
 - `./scripts/setup.sh` - One-time setup script for development environment

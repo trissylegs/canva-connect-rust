@@ -439,6 +439,7 @@ async fn test_create_and_get_design() {
 
     rate_limit_delay().await;
 
+    // Note: API doesn't provide design deletion endpoint, so created designs remain
     println!("✅ Create and get design test completed");
 }
 
@@ -485,6 +486,7 @@ async fn test_create_custom_design() {
 
     rate_limit_delay().await;
 
+    // Note: API doesn't provide design deletion endpoint, so created designs remain
     println!("✅ Custom design test completed");
 }
 
