@@ -23,7 +23,7 @@ tokio = { version = "1.0", features = ["full"] }
 
 ## Quick Start
 
-```rust
+```rust,no_run
 use canva_connect::{Client, auth::AccessToken};
 
 #[tokio::main]
@@ -31,9 +31,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create a client with your access token
     let client = Client::new(AccessToken::new("your-access-token"));
     
-    // List the user's assets
-    let assets = client.assets().list(None).await?;
-    println!("Found {} assets", assets.items.len());
+    // Get user profile information
+    let profile = client.user().get_profile().await?;
+    println!("User: {}", profile.display_name);
     
     Ok(())
 }
@@ -49,36 +49,41 @@ This library supports OAuth 2.0 authentication. You'll need to:
 
 ### OAuth Flow Example
 
-```rust
+```rust,no_run
 use canva_connect::auth::{OAuthClient, OAuthConfig, Scope};
+use canva_connect::{Client, auth::AccessToken};
 
-// Configure OAuth
-let config = OAuthConfig::new(
-    "your-client-id",
-    "your-client-secret", 
-    "https://your-app.com/callback",
-    vec![Scope::AssetRead, Scope::AssetWrite]
-);
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Configure OAuth
+    let config = OAuthConfig::new(
+        "your-client-id",
+        "your-client-secret", 
+        "https://your-app.com/callback",
+        vec![Scope::AssetRead, Scope::AssetWrite]
+    );
 
-let oauth_client = OAuthClient::new(config);
+    let oauth_client = OAuthClient::new(config);
 
-// Get authorization URL
-let auth_url = oauth_client.authorization_url(Some("state123"))?;
-println!("Visit: {}", auth_url);
+    // Get authorization URL
+    let auth_url = oauth_client.authorization_url(Some("state123"))?;
+    println!("Visit: {}", auth_url);
 
-// After user authorizes, exchange code for token
-let token_response = oauth_client.exchange_code("authorization-code").await?;
-let access_token = AccessToken::new(token_response.access_token);
+    // After user authorizes, exchange code for token
+    let token_response = oauth_client.exchange_code("authorization-code").await?;
+    let access_token = AccessToken::new(token_response.access_token);
 
-// Create API client
-let client = Client::new(access_token);
+    // Create API client
+    let client = Client::new(access_token);
+    Ok(())
+}
 ```
 
 ## Examples
 
 ### Upload an Asset from File
 
-```rust
+```rust,no_run
 use canva_connect::{Client, auth::AccessToken};
 use canva_connect::endpoints::assets::AssetUploadMetadata;
 use std::fs;
@@ -106,9 +111,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ### Upload an Asset from URL
 
-```rust
+```rust,no_run
 use canva_connect::{Client, auth::AccessToken};
-use canva_connect::endpoints::assets::{AssetUploadMetadata, CreateUrlAssetUploadJobRequest};
+use canva_connect::endpoints::assets::CreateUrlAssetUploadJobRequest;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -116,10 +121,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     let request = CreateUrlAssetUploadJobRequest {
         url: "https://example.com/image.png".to_string(),
-        upload_metadata: AssetUploadMetadata {
-            name: "Image from URL".to_string(),
-            tags: vec!["url-upload".to_string()],
-        },
+        name: "Image from URL".to_string(),
     };
     
     let upload_job = client.assets().create_url_upload_job(request).await?;
@@ -130,29 +132,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-### List and Filter Assets
+### Get Asset Details
 
-```rust
+```rust,no_run
 use canva_connect::{Client, auth::AccessToken};
-use canva_connect::endpoints::assets::ListAssetsOptions;
-use canva_connect::models::{OwnershipType, SortByType};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = Client::new(AccessToken::new("your-access-token"));
     
-    // List all assets
-    let assets = client.assets().list(None).await?;
+    // Get a specific asset by ID
+    let asset = client.assets().get("asset-id").await?;
+    println!("Asset: {} ({})", asset.name, asset.id);
     
-    // List with filtering
-    let filtered_assets = client.assets().list(Some(ListAssetsOptions {
-        query: Some("rust".to_string()),
-        ownership: Some(OwnershipType::Owned),
-        sort_by: Some(SortByType::CreatedDescending),
-        continuation: None,
-    })).await?;
+    // Update asset metadata
+    let update_request = canva_connect::endpoints::assets::UpdateAssetRequest {
+        name: Some("Updated Asset Name".to_string()),
+        tags: Some(vec!["rust".to_string(), "api".to_string()]),
+    };
     
-    println!("Found {} filtered assets", filtered_assets.items.len());
+    let updated_asset = client.assets().update("asset-id", update_request).await?;
+    println!("Updated asset: {}", updated_asset.name);
+    
     Ok(())
 }
 ```
@@ -235,20 +236,26 @@ Currently implemented endpoints:
 
 The library uses a comprehensive error system:
 
-```rust
-use canva_connect::error::{Error, Result};
+```rust,no_run
+use canva_connect::{Client, auth::AccessToken, Error};
 
-match client.assets().get("invalid-id").await {
-    Ok(asset) => println!("Asset: {}", asset.name),
-    Err(Error::Api { code, message }) => {
-        println!("API error {}: {}", code, message);
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new(AccessToken::new("your-access-token"));
+    
+    match client.assets().get("invalid-id").await {
+        Ok(asset) => println!("Asset: {}", asset.name),
+        Err(Error::Api { code, message }) => {
+            println!("API error {}: {}", code, message);
+        }
+        Err(Error::Http(e)) => {
+            println!("HTTP error: {}", e);
+        }
+        Err(e) => {
+            println!("Other error: {}", e);
+        }
     }
-    Err(Error::Http(e)) => {
-        println!("HTTP error: {}", e);
-    }
-    Err(e) => {
-        println!("Other error: {}", e);
-    }
+    Ok(())
 }
 ```
 
@@ -256,12 +263,15 @@ match client.assets().get("invalid-id").await {
 
 The client includes built-in rate limiting to respect API quotas:
 
-```rust
+```rust,no_run
 use canva_connect::{Client, auth::AccessToken, rate_limit::ApiRateLimiter};
 
+# fn main() {
+# let access_token = AccessToken::new("token");
 // Create client with custom rate limiter
 let rate_limiter = ApiRateLimiter::new(30); // 30 requests per minute
 let client = Client::with_rate_limiter(access_token, rate_limiter);
+# }
 ```
 
 ## Contributing

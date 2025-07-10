@@ -22,6 +22,11 @@
 - `cargo run --example asset_upload -- --file path/to/file` - Run with custom file path
 - `cargo run --example url_asset_upload -- --url "https://rustacean.net/assets/rustacean-flat-happy.png"` - Run with custom URL
 
+## Documentation Testing
+- `cargo test --test skeptic` - Test README.md code examples with skeptic (currently has dependency resolution issues)
+- Skeptic is configured to test all code examples in README.md for compilation
+- Examples marked with `no_run` compile but don't execute (to avoid needing API tokens)
+
 ## Integration Tests
 Integration tests make real API calls to Canva Connect and require valid credentials:
 

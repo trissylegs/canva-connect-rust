@@ -51,6 +51,10 @@ mockito = "1.2"
 env_logger = "0.10"
 log = "0.4"
 serde_test = "1.0"
+skeptic = "0.13"
+
+[build-dependencies]
+skeptic = "0.13"
 
 [features]
 default = ["rustls-tls"]
@@ -69,3 +73,7 @@ path = "examples/observability.rs"
 [[example]]
 name = "url_asset_upload"
 path = "examples/url_asset_upload.rs"
+
+[[test]]
+name = "skeptic"
+harness = false
