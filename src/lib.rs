@@ -60,6 +60,18 @@
 //! # }
 //! ```
 //!
+//! ## OAuth Scopes
+//!
+//! Different API operations require different OAuth scopes. See [`auth::scopes`] for
+//! a complete list of available scopes and their usage.
+//!
+//! Common scopes include:
+//! - `asset:read` - Read access to user's assets
+//! - `asset:write` - Write access to user's assets  
+//! - `design:meta:read` - Read access to design metadata
+//! - `design:content:read` - Read access to design content
+//! - `design:content:write` - Write access to design content
+//!
 //! ## Examples
 //!
 //! ### Asset Upload

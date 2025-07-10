@@ -9,13 +9,22 @@
 //!
 //! ## Available Operations
 //!
-//! - [`get`](AssetsApi::get) - Get metadata for a specific asset
-//! - [`update`](AssetsApi::update) - Update asset name and tags
-//! - [`delete`](AssetsApi::delete) - Delete an asset (moves to trash)
-//! - [`create_upload_job`](AssetsApi::create_upload_job) - Upload asset from binary data
-//! - [`create_url_upload_job`](AssetsApi::create_url_upload_job) - Upload asset from URL
-//! - [`get_upload_job`](AssetsApi::get_upload_job) - Check upload job status
-//! - [`wait_for_upload_job`](AssetsApi::wait_for_upload_job) - Wait for upload completion
+//! | Operation | Method | Endpoint | Required Scope | Description |
+//! |-----------|---------|----------|----------------|-------------|
+//! | [`get`](AssetsApi::get) | `GET` | `/v1/assets/{assetId}` | `asset:read` | Get metadata for a specific asset |
+//! | [`update`](AssetsApi::update) | `PATCH` | `/v1/assets/{assetId}` | `asset:write` | Update asset name and tags |
+//! | [`delete`](AssetsApi::delete) | `DELETE` | `/v1/assets/{assetId}` | `asset:write` | Delete an asset (moves to trash) |
+//! | [`create_upload_job`](AssetsApi::create_upload_job) | `POST` | `/v1/asset-uploads` | `asset:write` | Upload asset from binary data |
+//! | [`create_url_upload_job`](AssetsApi::create_url_upload_job) | `POST` | `/v1/url-asset-uploads` | `asset:write` | Upload asset from URL |
+//! | [`get_upload_job`](AssetsApi::get_upload_job) | `GET` | `/v1/asset-uploads/{jobId}` | `asset:read` | Check upload job status |
+//! | [`get_url_upload_job`](AssetsApi::get_url_upload_job) | `GET` | `/v1/url-asset-uploads/{jobId}` | `asset:read` | Check URL upload job status |
+//! | [`wait_for_upload_job`](AssetsApi::wait_for_upload_job) | N/A | Multiple calls | `asset:read` | Wait for upload completion |
+//! | [`wait_for_url_upload_job`](AssetsApi::wait_for_url_upload_job) | N/A | Multiple calls | `asset:read` | Wait for URL upload completion |
+//!
+//! ## OAuth Scopes
+//!
+//! - **`asset:read`** - Required for reading asset metadata and checking upload job status
+//! - **`asset:write`** - Required for creating, updating, and deleting assets
 //!
 //! ## Note on Asset Listing
 //!
@@ -39,6 +48,8 @@ impl AssetsApi {
     }
 
     /// Get a specific asset by ID
+    ///
+    /// **Required OAuth scope:** `asset:read`
     pub async fn get(&self, asset_id: &str) -> Result<Asset> {
         let path = format!("/v1/assets/{asset_id}");
         let response: GetAssetResponse = self.client.get_json(&path).await?;
@@ -46,6 +57,8 @@ impl AssetsApi {
     }
 
     /// Update an asset (name and tags)
+    ///
+    /// **Required OAuth scope:** `asset:write`
     pub async fn update(&self, asset_id: &str, request: UpdateAssetRequest) -> Result<Asset> {
         let path = format!("/v1/assets/{asset_id}");
         let response: UpdateAssetResponse = self.client.patch_json(&path, &request).await?;
@@ -53,6 +66,8 @@ impl AssetsApi {
     }
 
     /// Delete an asset
+    ///
+    /// **Required OAuth scope:** `asset:write`
     pub async fn delete(&self, asset_id: &str) -> Result<()> {
         let path = format!("/v1/assets/{asset_id}");
         self.client.delete(&path).await?;
@@ -60,6 +75,8 @@ impl AssetsApi {
     }
 
     /// Create an asset upload job
+    ///
+    /// **Required OAuth scope:** `asset:write`
     pub async fn create_upload_job(
         &self,
         file_data: Vec<u8>,
@@ -75,6 +92,8 @@ impl AssetsApi {
     }
 
     /// Get the status of an asset upload job
+    ///
+    /// **Required OAuth scope:** `asset:read`
     pub async fn get_upload_job(&self, job_id: &str) -> Result<crate::models::AssetUploadJob> {
         let path = format!("/v1/asset-uploads/{job_id}");
         let response: crate::models::AssetUploadJobResponse = self.client.get_json(&path).await?;
@@ -82,6 +101,8 @@ impl AssetsApi {
     }
 
     /// Create an asset upload job from URL
+    ///
+    /// **Required OAuth scope:** `asset:write`
     pub async fn create_url_upload_job(
         &self,
         request: CreateUrlAssetUploadJobRequest,
@@ -94,6 +115,8 @@ impl AssetsApi {
     }
 
     /// Get the status of a URL asset upload job
+    ///
+    /// **Required OAuth scope:** `asset:read`
     pub async fn get_url_upload_job(&self, job_id: &str) -> Result<crate::models::AssetUploadJob> {
         let path = format!("/v1/url-asset-uploads/{job_id}");
         let response: crate::models::AssetUploadJobResponse = self.client.get_json(&path).await?;
@@ -101,6 +124,8 @@ impl AssetsApi {
     }
 
     /// Wait for an upload job to complete
+    ///
+    /// **Required OAuth scope:** `asset:read`
     pub async fn wait_for_upload_job(&self, job_id: &str) -> Result<crate::models::Asset> {
         loop {
             let job = self.get_upload_job(job_id).await?;
@@ -127,6 +152,8 @@ impl AssetsApi {
     }
 
     /// Wait for a URL upload job to complete
+    ///
+    /// **Required OAuth scope:** `asset:read`
     pub async fn wait_for_url_upload_job(&self, job_id: &str) -> Result<crate::models::Asset> {
         loop {
             let job = self.get_url_upload_job(job_id).await?;

@@ -1,4 +1,9 @@
 //! Authentication types and utilities for the Canva Connect API
+//!
+//! This module provides OAuth 2.0 authentication support for the Canva Connect API,
+//! including access token management and OAuth scope documentation.
+
+pub mod scopes;
 
 use crate::error::{Error, Result};
 use serde::{Deserialize, Serialize};
