@@ -1,1 +1,0 @@
-cargo:rustc-env=MIME_TYPES_GENERATED_PATH=/Users/triss/work/hackathon2025/target/debug/build/mime_guess-859f61f14255637d/out/mime_types_generated.rs

@@ -1,6 +1,8 @@
 # Rust
 /target/
 **/*.rs.bk
+
+# For libraries, uncomment the following line to ignore Cargo.lock:
 Cargo.lock
 
 # IDE
