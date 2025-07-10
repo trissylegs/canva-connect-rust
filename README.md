@@ -303,6 +303,9 @@ cargo clippy --all-targets --all-features -- -D warnings
 # Run tests
 cargo test --all-features
 
+# Run integration tests (requires valid API credentials)
+CANVA_INTEGRATION_TESTS=1 cargo test --test integration
+
 # Build release
 cargo build --release
 ```

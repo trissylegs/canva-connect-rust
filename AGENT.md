@@ -21,6 +21,18 @@
 - `cargo run --example url_asset_upload -- --url "https://rustacean.net/assets/rustacean-flat-happy.png"` - Run with CLI args
 - `cargo run --example user_profile -- --token TOKEN` - Run with CLI args
 
+## Integration Tests
+Integration tests make real API calls to Canva Connect and require valid credentials:
+
+- `CANVA_INTEGRATION_TESTS=1 cargo test --test integration` - Run integration tests only
+- `CANVA_INTEGRATION_TESTS=1 cargo test` - Run all tests including integration tests
+
+**Setup for integration tests:**
+1. Set `CANVA_ACCESS_TOKEN` environment variable with a valid token
+2. Set `CANVA_INTEGRATION_TESTS=1` to enable the tests
+3. Tests will automatically clean up any assets they create
+4. Tests respect rate limits with built-in delays
+
 ## Development Scripts
 - `./scripts/setup.sh` - One-time setup script for development environment
 - `./scripts/check.sh` - Run all CI checks locally (formatting, clippy, tests, build)
