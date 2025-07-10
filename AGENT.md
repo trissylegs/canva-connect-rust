@@ -97,7 +97,7 @@ Individual commands:
 - Implement comprehensive error handling with custom error types
 
 ## API Design Patterns
-- **Tagged Unions (oneOf)**: The Canva API uses oneOf patterns with discriminator fields. In Rust, model these as enums with `#[serde(tag = "type", rename_all = "lowercase")]` instead of separate structs with explicit type fields. For example, `DesignTypeInput` is a tagged union with `Preset` and `Custom` variants where serde automatically handles the `type` discriminator field.
+- **Tagged Unions (oneOf)**: The Canva API uses oneOf patterns with discriminator fields. In Rust, model these as enums with `#[serde(tag = "type", rename_all = "snake_case")]` instead of separate structs with explicit type fields. For example, `DesignTypeInput` is a tagged union with `Preset` and `Custom` variants where serde automatically handles the `type` discriminator field.
 
 ## API Specification
 The `public-api.json` file contains the complete OpenAPI 3.0 specification for the Canva Connect API. You can search it efficiently using `jq`:

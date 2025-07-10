@@ -138,7 +138,7 @@ pub struct GetDesignResponse {
 
 /// Design type input for creating designs (tagged union)
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type", rename_all = "lowercase")]
+#[serde(tag = "type", rename_all = "snake_case")]
 pub enum DesignTypeInput {
     /// Preset design type
     Preset {
