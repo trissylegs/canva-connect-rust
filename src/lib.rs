@@ -23,7 +23,7 @@
 //!     
 //!     // Create an asset upload job
 //!     let metadata = canva_connect::endpoints::assets::AssetUploadMetadata::new(
-//!         "my-image.png", 
+//!         "my-image.png",
 //!         vec!["design".to_string()]
 //!     );
 //!     let upload_job = client.assets().create_upload_job(vec![], metadata).await?;

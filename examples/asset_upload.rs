@@ -10,11 +10,7 @@
 //!
 //! Alternative: cargo run --example asset_upload -- --token YOUR_ACCESS_TOKEN --file path/to/image.png
 
-use canva_connect::{
-    auth::AccessToken,
-    endpoints::assets::AssetUploadMetadata,
-    Client,
-};
+use canva_connect::{auth::AccessToken, endpoints::assets::AssetUploadMetadata, Client};
 use std::env;
 use std::fs;
 use std::path::Path;
@@ -23,14 +19,14 @@ use std::path::Path;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load environment variables from .env file
     dotenv::dotenv().ok();
-    
+
     // Get access token from .env file or command line arguments
     let access_token = if let Ok(token) = env::var("CANVA_ACCESS_TOKEN") {
         token
     } else {
         // Fallback to command line parsing
         let args: Vec<String> = env::args().collect();
-        
+
         let mut access_token = None;
         let mut i = 1;
         while i < args.len() {
@@ -40,7 +36,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             i += 1;
         }
-        
+
         access_token.unwrap_or_else(|| {
             eprintln!("Error: Access token not found.");
             eprintln!("Please either:");
@@ -56,7 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     } else {
         // Parse command line arguments for file path
         let args: Vec<String> = env::args().collect();
-        
+
         let mut file_path = None;
         let mut i = 1;
         while i < args.len() {
@@ -66,7 +62,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             i += 1;
         }
-        
+
         file_path.unwrap_or_else(|| {
             eprintln!("Error: File path not found.");
             eprintln!("Please either:");
@@ -82,10 +78,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("✓ Created Canva Connect API client");
 
     // Read the file
-    let file_data = fs::read(&file_path).map_err(|e| {
-        format!("Failed to read file '{}': {}", file_path, e)
-    })?;
-    
+    let file_data =
+        fs::read(&file_path).map_err(|e| format!("Failed to read file '{}': {}", file_path, e))?;
+
     let file_name = Path::new(&file_path)
         .file_name()
         .and_then(|name| name.to_str())
@@ -112,10 +107,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Wait for the upload to complete
     println!("⏳ Waiting for upload to complete...");
-    let asset = client
-        .assets()
-        .wait_for_upload_job(&upload_job.id)
-        .await?;
+    let asset = client.assets().wait_for_upload_job(&upload_job.id).await?;
 
     println!("🎉 Upload completed successfully!");
     println!("Asset ID: {}", asset.id);
@@ -125,7 +117,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Created: {}", asset.created_at);
 
     if let Some(thumbnail) = &asset.thumbnail {
-        println!("Thumbnail: {}x{} - {}", thumbnail.width, thumbnail.height, thumbnail.url);
+        println!(
+            "Thumbnail: {}x{} - {}",
+            thumbnail.width, thumbnail.height, thumbnail.url
+        );
     }
 
     println!("\n✅ Asset upload completed successfully!");

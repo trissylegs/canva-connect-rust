@@ -8,15 +8,20 @@ use std::time::Duration;
 /// Rate limiter for API requests
 #[derive(Debug)]
 pub struct ApiRateLimiter {
-    limiter: RateLimiter<governor::state::direct::NotKeyed, governor::state::InMemoryState, governor::clock::DefaultClock>,
+    limiter: RateLimiter<
+        governor::state::direct::NotKeyed,
+        governor::state::InMemoryState,
+        governor::clock::DefaultClock,
+    >,
 }
 
 impl ApiRateLimiter {
     /// Create a new rate limiter with the given rate limit per minute
     pub fn new(requests_per_minute: u32) -> Self {
-        let quota = Quota::per_minute(NonZeroU32::new(requests_per_minute).unwrap_or(nonzero!(60u32)));
+        let quota =
+            Quota::per_minute(NonZeroU32::new(requests_per_minute).unwrap_or(nonzero!(60u32)));
         let limiter = RateLimiter::direct(quota);
-        
+
         Self { limiter }
     }
 

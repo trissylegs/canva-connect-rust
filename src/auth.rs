@@ -140,7 +140,7 @@ impl OAuthConfig {
     /// Generate the authorization URL for the OAuth flow
     pub fn authorization_url(&self, state: Option<&str>) -> Result<String> {
         let mut url = url::Url::parse("https://www.canva.com/api/oauth/authorize")?;
-        
+
         url.query_pairs_mut()
             .append_pair("client_id", &self.client_id)
             .append_pair("redirect_uri", &self.redirect_uri)
@@ -227,7 +227,10 @@ impl OAuthClient {
             Ok(token_response)
         } else {
             let error_text = response.text().await?;
-            Err(Error::Auth(format!("Token exchange failed: {}", error_text)))
+            Err(Error::Auth(format!(
+                "Token exchange failed: {}",
+                error_text
+            )))
         }
     }
 }

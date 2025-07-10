@@ -27,10 +27,7 @@ impl Client {
             AUTHORIZATION,
             HeaderValue::from_str(&access_token.authorization_header()).unwrap(),
         );
-        headers.insert(
-            CONTENT_TYPE,
-            HeaderValue::from_static("application/json"),
-        );
+        headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
         headers.insert(
             USER_AGENT,
             HeaderValue::from_static("canva-connect-rust/0.1.0"),
@@ -109,23 +106,36 @@ impl Client {
     }
 
     /// Make a POST request
-    pub async fn post<T: serde::Serialize>(&self, path: &str, body: &T) -> Result<reqwest::Response> {
+    pub async fn post<T: serde::Serialize>(
+        &self,
+        path: &str,
+        body: &T,
+    ) -> Result<reqwest::Response> {
         self.request(reqwest::Method::POST, path, Some(body)).await
     }
 
     /// Make a PUT request
-    pub async fn put<T: serde::Serialize>(&self, path: &str, body: &T) -> Result<reqwest::Response> {
+    pub async fn put<T: serde::Serialize>(
+        &self,
+        path: &str,
+        body: &T,
+    ) -> Result<reqwest::Response> {
         self.request(reqwest::Method::PUT, path, Some(body)).await
     }
 
     /// Make a PATCH request
-    pub async fn patch<T: serde::Serialize>(&self, path: &str, body: &T) -> Result<reqwest::Response> {
+    pub async fn patch<T: serde::Serialize>(
+        &self,
+        path: &str,
+        body: &T,
+    ) -> Result<reqwest::Response> {
         self.request(reqwest::Method::PATCH, path, Some(body)).await
     }
 
     /// Make a DELETE request
     pub async fn delete(&self, path: &str) -> Result<reqwest::Response> {
-        self.request(reqwest::Method::DELETE, path, None::<&()>).await
+        self.request(reqwest::Method::DELETE, path, None::<&()>)
+            .await
     }
 
     /// Make a request with optional body
@@ -146,7 +156,7 @@ impl Client {
         }
 
         let response = request.send().await?;
-        
+
         // Update rate limit info from headers
         let _rate_limit_info = RateLimitInfo::from_headers(response.headers());
 
@@ -159,9 +169,12 @@ impl Client {
     }
 
     /// Handle error responses from the API
-    async fn handle_error_response(&self, response: reqwest::Response) -> Result<reqwest::Response> {
+    async fn handle_error_response(
+        &self,
+        response: reqwest::Response,
+    ) -> Result<reqwest::Response> {
         let status = response.status();
-        
+
         // Try to parse API error
         if let Ok(api_error) = response.json::<ApiError>().await {
             return Err(Error::from(api_error));

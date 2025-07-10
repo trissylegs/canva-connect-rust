@@ -23,7 +23,7 @@ use std::env;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load environment variables from .env file
     dotenv::dotenv().ok();
-    
+
     // Get access token from .env file or command line arguments
     let access_token = if let Ok(token) = env::var("CANVA_ACCESS_TOKEN") {
         token
@@ -47,7 +47,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Example 1: Upload an asset from URL
     println!("\n🚀 Uploading asset from URL...");
-    
+
     let url_upload_request = CreateUrlAssetUploadJobRequest {
         url: "https://images.unsplash.com/photo-1518837695005-2083093ee35b".to_string(),
         upload_metadata: AssetUploadMetadata::new(

@@ -1,12 +1,7 @@
 //! Assets API endpoints
 
-use crate::{
-    client::Client,
-    error::Result,
-    models::*,
-};
+use crate::{client::Client, error::Result, models::*};
 use serde::{Deserialize, Serialize};
-
 
 /// Assets API client
 #[derive(Debug, Clone)]
@@ -21,25 +16,31 @@ impl AssetsApi {
     }
 
     /// List assets with optional filtering and pagination
-    pub async fn list(&self, options: Option<ListAssetsOptions>) -> Result<PaginatedResponse<Asset>> {
+    pub async fn list(
+        &self,
+        options: Option<ListAssetsOptions>,
+    ) -> Result<PaginatedResponse<Asset>> {
         let mut path = "/v1/assets".to_string();
-        
+
         if let Some(opts) = options {
             let mut query_params = Vec::new();
-            
+
             if let Some(query) = opts.query {
                 query_params.push(format!("query={}", urlencoding::encode(&query)));
             }
             if let Some(continuation) = opts.continuation {
-                query_params.push(format!("continuation={}", urlencoding::encode(&continuation)));
+                query_params.push(format!(
+                    "continuation={}",
+                    urlencoding::encode(&continuation)
+                ));
             }
             if let Some(ownership) = opts.ownership {
-                query_params.push(format!("ownership={}", ownership.to_string()));
+                query_params.push(format!("ownership={}", ownership));
             }
             if let Some(sort_by) = opts.sort_by {
-                query_params.push(format!("sort_by={}", sort_by.to_string()));
+                query_params.push(format!("sort_by={}", sort_by));
             }
-            
+
             if !query_params.is_empty() {
                 path.push('?');
                 path.push_str(&query_params.join("&"));
@@ -71,9 +72,16 @@ impl AssetsApi {
     }
 
     /// Create an asset upload job
-    pub async fn create_upload_job(&self, file_data: Vec<u8>, metadata: AssetUploadMetadata) -> Result<crate::models::AssetUploadJob> {
+    pub async fn create_upload_job(
+        &self,
+        file_data: Vec<u8>,
+        metadata: AssetUploadMetadata,
+    ) -> Result<crate::models::AssetUploadJob> {
         let metadata_json = serde_json::to_string(&metadata)?;
-        let response = self.client.upload_file("/v1/asset-uploads", file_data, Some(&metadata_json)).await?;
+        let response = self
+            .client
+            .upload_file("/v1/asset-uploads", file_data, Some(&metadata_json))
+            .await?;
         let job_response: crate::models::AssetUploadJobResponse = response.json().await?;
         Ok(job_response.job)
     }
@@ -86,8 +94,14 @@ impl AssetsApi {
     }
 
     /// Create an asset upload job from URL
-    pub async fn create_url_upload_job(&self, request: CreateUrlAssetUploadJobRequest) -> Result<crate::models::AssetUploadJob> {
-        let response: crate::models::AssetUploadJobResponse = self.client.post_json("/v1/url-asset-uploads", &request).await?;
+    pub async fn create_url_upload_job(
+        &self,
+        request: CreateUrlAssetUploadJobRequest,
+    ) -> Result<crate::models::AssetUploadJob> {
+        let response: crate::models::AssetUploadJobResponse = self
+            .client
+            .post_json("/v1/url-asset-uploads", &request)
+            .await?;
         Ok(response.job)
     }
 
@@ -102,13 +116,16 @@ impl AssetsApi {
     pub async fn wait_for_upload_job(&self, job_id: &str) -> Result<crate::models::Asset> {
         loop {
             let job = self.get_upload_job(job_id).await?;
-            
+
             match job.status {
                 JobStatus::Success => {
-                    return job.asset.ok_or_else(|| crate::error::Error::Generic("Job succeeded but no asset data".to_string()));
+                    return job.asset.ok_or_else(|| {
+                        crate::error::Error::Generic("Job succeeded but no asset data".to_string())
+                    });
                 }
                 JobStatus::Failed => {
-                    let error_msg = job.error
+                    let error_msg = job
+                        .error
                         .map(|e| format!("{}: {}", e.code, e.message))
                         .unwrap_or_else(|| "Job failed with unknown error".to_string());
                     return Err(crate::error::Error::Generic(error_msg));
@@ -125,13 +142,16 @@ impl AssetsApi {
     pub async fn wait_for_url_upload_job(&self, job_id: &str) -> Result<crate::models::Asset> {
         loop {
             let job = self.get_url_upload_job(job_id).await?;
-            
+
             match job.status {
                 JobStatus::Success => {
-                    return job.asset.ok_or_else(|| crate::error::Error::Generic("Job succeeded but no asset data".to_string()));
+                    return job.asset.ok_or_else(|| {
+                        crate::error::Error::Generic("Job succeeded but no asset data".to_string())
+                    });
                 }
                 JobStatus::Failed => {
-                    let error_msg = job.error
+                    let error_msg = job
+                        .error
                         .map(|e| format!("{}: {}", e.code, e.message))
                         .unwrap_or_else(|| "Job failed with unknown error".to_string());
                     return Err(crate::error::Error::Generic(error_msg));
@@ -171,7 +191,7 @@ pub struct AssetUploadMetadata {
 impl AssetUploadMetadata {
     /// Create new metadata with name automatically Base64 encoded
     pub fn new(name: &str, tags: Vec<String>) -> Self {
-        use base64::{Engine as _, engine::general_purpose::STANDARD};
+        use base64::{engine::general_purpose::STANDARD, Engine as _};
         Self {
             name_base64: STANDARD.encode(name.as_bytes()),
             tags,
@@ -211,25 +231,25 @@ pub struct UpdateAssetResponse {
     pub asset: Asset,
 }
 
-impl ToString for OwnershipType {
-    fn to_string(&self) -> String {
+impl std::fmt::Display for OwnershipType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            OwnershipType::Owned => "owned".to_string(),
-            OwnershipType::Shared => "shared".to_string(),
-            OwnershipType::All => "all".to_string(),
+            OwnershipType::Owned => write!(f, "owned"),
+            OwnershipType::Shared => write!(f, "shared"),
+            OwnershipType::All => write!(f, "all"),
         }
     }
 }
 
-impl ToString for SortByType {
-    fn to_string(&self) -> String {
+impl std::fmt::Display for SortByType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            SortByType::CreatedDescending => "created_descending".to_string(),
-            SortByType::CreatedAscending => "created_ascending".to_string(),
-            SortByType::ModifiedDescending => "modified_descending".to_string(),
-            SortByType::ModifiedAscending => "modified_ascending".to_string(),
-            SortByType::NameAscending => "name_ascending".to_string(),
-            SortByType::NameDescending => "name_descending".to_string(),
+            SortByType::CreatedDescending => write!(f, "created_descending"),
+            SortByType::CreatedAscending => write!(f, "created_ascending"),
+            SortByType::ModifiedDescending => write!(f, "modified_descending"),
+            SortByType::ModifiedAscending => write!(f, "modified_ascending"),
+            SortByType::NameAscending => write!(f, "name_ascending"),
+            SortByType::NameDescending => write!(f, "name_descending"),
         }
     }
 }

@@ -3,7 +3,7 @@ use canva_connect::rate_limit::*;
 #[test]
 fn test_api_rate_limiter_creation() {
     let rate_limiter = ApiRateLimiter::default();
-    
+
     // Should create successfully
     assert!(format!("{:?}", rate_limiter).contains("ApiRateLimiter"));
 }
@@ -11,7 +11,7 @@ fn test_api_rate_limiter_creation() {
 #[test]
 fn test_api_rate_limiter_debug() {
     let limiter1 = ApiRateLimiter::default();
-    
+
     // Should be able to debug print
     assert!(format!("{:?}", limiter1).contains("ApiRateLimiter"));
 }
@@ -19,7 +19,7 @@ fn test_api_rate_limiter_debug() {
 #[test]
 fn test_rate_limiter_basic_operation() {
     let rate_limiter = ApiRateLimiter::default();
-    
+
     // Should be able to create rate limiter
     // This test mainly verifies the API is accessible
     assert!(format!("{:?}", rate_limiter).contains("ApiRateLimiter"));
@@ -32,7 +32,7 @@ fn test_rate_limit_info_creation() {
         reset_at: Some(chrono::Utc::now()),
         limit: Some(1000),
     };
-    
+
     assert_eq!(info.remaining, Some(100));
     assert_eq!(info.limit, Some(1000));
     assert!(info.reset_at.is_some());
@@ -46,7 +46,7 @@ fn test_rate_limit_info_with_zero_remaining() {
         reset_at: Some(future_time),
         limit: Some(100),
     };
-    
+
     assert_eq!(info.remaining, Some(0));
     assert!(info.reset_at.unwrap() > chrono::Utc::now());
 }
@@ -58,7 +58,7 @@ fn test_rate_limit_info_debug() {
         reset_at: Some(chrono::Utc::now()),
         limit: Some(100),
     };
-    
+
     let debug_str = format!("{:?}", info);
     assert!(debug_str.contains("remaining"));
 }
@@ -71,7 +71,7 @@ fn test_rate_limit_info_clone() {
         reset_at: Some(now),
         limit: Some(100),
     };
-    
+
     let info2 = info1.clone();
     assert_eq!(info1.remaining, info2.remaining);
     assert_eq!(info1.reset_at, info2.reset_at);
@@ -86,7 +86,7 @@ fn test_rate_limit_info_with_past_reset_time() {
         reset_at: Some(past_time),
         limit: Some(100),
     };
-    
+
     assert_eq!(info.remaining, Some(75));
     assert!(info.reset_at.unwrap() < chrono::Utc::now());
 }
