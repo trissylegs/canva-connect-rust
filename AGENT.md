@@ -70,6 +70,8 @@ Individual commands:
 - `src/rate_limit.rs` - Rate limiting implementation
 - `src/endpoints/` - API endpoint implementations
   - `assets.rs` - Assets API (fully implemented)
+  - `designs.rs` - Designs API (fully implemented)
+  - `user.rs` - User API (fully implemented)
   - `mod.rs` - Other endpoints (stub implementations)
 
 ## Code Style
@@ -101,6 +103,7 @@ jq '.components.schemas | keys[] | select(contains("Design"))' public-api.json
 - ✅ Core client with OAuth 2.0 authentication
 - ✅ Rate limiting and error handling
 - ✅ Assets API (upload, get, update, delete)
+- ✅ Designs API (list, get, create)
 - ✅ User API (profile, capabilities, identification)
 - ✅ Observability (OpenTelemetry tracing with feature flag)
 - ✅ Integration tests with automatic cleanup and rate limiting

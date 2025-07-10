@@ -340,3 +340,173 @@ async fn test_asset_error_handling() {
 
     println!("✅ Asset error handling test completed");
 }
+
+// Designs API integration tests
+use canva_connect::models::{
+    CreateDesignRequest, CustomDesignTypeInput, DesignTypeInput, OwnershipType,
+    PresetDesignTypeInput, PresetDesignTypeName, SortByType,
+};
+
+#[tokio::test]
+async fn test_list_designs() {
+    let config = skip_if_no_config!();
+
+    let designs_api = config.client.designs();
+
+    // Test listing designs without filters
+    let designs = designs_api
+        .list(None, None, None, None)
+        .await
+        .expect("Failed to list designs");
+
+    println!("✅ Listed {} designs", designs.designs.len());
+
+    // Verify structure
+    for design in &designs.designs {
+        assert!(!design.id.is_empty());
+        assert!(!design.urls.edit_url.is_empty());
+        assert!(!design.urls.view_url.is_empty());
+        assert!(!design.owner.user_id.is_empty());
+        assert!(!design.owner.team_id.is_empty());
+    }
+
+    rate_limit_delay().await;
+
+    // Test with filters
+    let filtered_designs = designs_api
+        .list(
+            None,
+            None,
+            Some(OwnershipType::Any),
+            Some(SortByType::ModifiedDescending),
+        )
+        .await
+        .expect("Failed to list filtered designs");
+
+    println!(
+        "✅ Listed {} filtered designs",
+        filtered_designs.designs.len()
+    );
+
+    rate_limit_delay().await;
+}
+
+#[tokio::test]
+async fn test_create_and_get_design() {
+    let config = skip_if_no_config!();
+
+    let designs_api = config.client.designs();
+
+    // Create a new presentation design
+    let create_request = CreateDesignRequest {
+        design_type: Some(DesignTypeInput::Preset(PresetDesignTypeInput {
+            design_type: PresetDesignTypeName::Presentation,
+        })),
+        title: Some("Integration Test Presentation".to_string()),
+        asset_id: None,
+    };
+
+    println!("📄 Creating new presentation design...");
+
+    let created_design = designs_api
+        .create(create_request)
+        .await
+        .expect("Failed to create design");
+
+    println!("✅ Created design: {}", created_design.design.id);
+    assert!(!created_design.design.id.is_empty());
+    assert_eq!(
+        created_design.design.title,
+        Some("Integration Test Presentation".to_string())
+    );
+
+    rate_limit_delay().await;
+
+    // Get the created design
+    let retrieved_design = designs_api
+        .get(&created_design.design.id)
+        .await
+        .expect("Failed to get design");
+
+    assert_eq!(retrieved_design.design.id, created_design.design.id);
+    assert_eq!(retrieved_design.design.title, created_design.design.title);
+    assert!(!retrieved_design.design.urls.edit_url.is_empty());
+    assert!(!retrieved_design.design.urls.view_url.is_empty());
+
+    println!("✅ Retrieved design verified");
+    println!("   Title: {:?}", retrieved_design.design.title);
+    println!("   Pages: {:?}", retrieved_design.design.page_count);
+    println!("   Edit URL: {}", retrieved_design.design.urls.edit_url);
+
+    rate_limit_delay().await;
+
+    println!("✅ Create and get design test completed");
+}
+
+#[tokio::test]
+async fn test_create_custom_design() {
+    let config = skip_if_no_config!();
+
+    let designs_api = config.client.designs();
+
+    // Create a custom-sized design
+    let create_request = CreateDesignRequest {
+        design_type: Some(DesignTypeInput::Custom(CustomDesignTypeInput {
+            width: 800,
+            height: 600,
+        })),
+        title: Some("Custom Integration Test Design".to_string()),
+        asset_id: None,
+    };
+
+    println!("📄 Creating custom design (800x600)...");
+
+    let created_design = designs_api
+        .create(create_request)
+        .await
+        .expect("Failed to create custom design");
+
+    println!("✅ Created custom design: {}", created_design.design.id);
+    assert!(!created_design.design.id.is_empty());
+    assert_eq!(
+        created_design.design.title,
+        Some("Custom Integration Test Design".to_string())
+    );
+
+    rate_limit_delay().await;
+
+    // Verify we can get the custom design
+    let retrieved_design = designs_api
+        .get(&created_design.design.id)
+        .await
+        .expect("Failed to get custom design");
+
+    assert_eq!(retrieved_design.design.id, created_design.design.id);
+    println!("✅ Custom design verified");
+
+    rate_limit_delay().await;
+
+    println!("✅ Custom design test completed");
+}
+
+#[tokio::test]
+async fn test_design_error_handling() {
+    let config = skip_if_no_config!();
+
+    let designs_api = config.client.designs();
+
+    // Test getting non-existent design
+    let result = designs_api.get("non-existent-design-id").await;
+    assert!(result.is_err());
+
+    match result {
+        Err(canva_connect::Error::Api { code, message }) => {
+            println!("✅ Correct error for non-existent design: {code} - {message}");
+        }
+        _ => panic!("Expected API error for non-existent design"),
+    }
+
+    rate_limit_delay().await;
+
+    println!("✅ Design error handling test completed");
+}

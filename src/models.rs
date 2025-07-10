@@ -54,36 +54,171 @@ pub struct Design {
     /// Design ID
     pub id: String,
     /// Design title
-    pub title: String,
-    /// Design type
-    #[serde(rename = "type")]
-    pub design_type: DesignType,
+    pub title: Option<String>,
+    /// Design owner
+    pub owner: TeamUserSummary,
     /// Design thumbnail
     pub thumbnail: Option<Thumbnail>,
     /// Design URLs
-    pub urls: DesignUrls,
-    /// Design creation timestamp
+    pub urls: DesignLinks,
+    /// Design creation timestamp (Unix timestamp in seconds)
+    #[serde(with = "chrono::serde::ts_seconds")]
     pub created_at: chrono::DateTime<chrono::Utc>,
-    /// Design last updated timestamp
+    /// Design last updated timestamp (Unix timestamp in seconds)
+    #[serde(with = "chrono::serde::ts_seconds")]
     pub updated_at: chrono::DateTime<chrono::Utc>,
+    /// Total number of pages in the design
+    pub page_count: Option<u32>,
 }
 
-/// Design type
+/// Team user summary containing user and team IDs
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DesignType {
-    /// Design type ID
-    pub id: String,
-    /// Design type label
-    pub label: String,
+pub struct TeamUserSummary {
+    /// User ID
+    pub user_id: String,
+    /// Team ID
+    pub team_id: String,
 }
 
-/// Design URLs
+/// Design URLs for editing and viewing
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DesignUrls {
-    /// Edit URL
+pub struct DesignLinks {
+    /// Temporary edit URL (valid for 30 days)
     pub edit_url: String,
-    /// View URL
+    /// Temporary view URL (valid for 30 days)
     pub view_url: String,
+}
+
+/// Request to list designs
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ListDesignsRequest {
+    /// Search query
+    pub query: Option<String>,
+    /// Continuation token for pagination
+    pub continuation: Option<String>,
+    /// Filter by ownership
+    pub ownership: Option<OwnershipType>,
+    /// Sort order
+    pub sort_by: Option<SortByType>,
+}
+
+/// Response for listing designs
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GetListDesignResponse {
+    /// List of designs
+    pub designs: Vec<Design>,
+    /// Continuation token for next page
+    pub continuation: Option<String>,
+}
+
+/// Request to create a design
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateDesignRequest {
+    /// Design type configuration
+    pub design_type: Option<DesignTypeInput>,
+    /// Asset ID to insert into the design
+    pub asset_id: Option<String>,
+    /// Design title
+    pub title: Option<String>,
+}
+
+/// Response for creating a design
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateDesignResponse {
+    /// Created design
+    pub design: Design,
+}
+
+/// Response for getting a design
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GetDesignResponse {
+    /// Design data
+    pub design: Design,
+}
+
+/// Design type input for creating designs
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum DesignTypeInput {
+    /// Preset design type
+    Preset(PresetDesignTypeInput),
+    /// Custom design type
+    Custom(CustomDesignTypeInput),
+}
+
+/// Preset design type configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PresetDesignTypeInput {
+    /// Preset design type name
+    #[serde(rename = "type")]
+    pub design_type: PresetDesignTypeName,
+}
+
+/// Custom design type configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CustomDesignTypeInput {
+    /// Design width in pixels
+    pub width: u32,
+    /// Design height in pixels
+    pub height: u32,
+}
+
+/// Preset design type names
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PresetDesignTypeName {
+    /// Presentation (16:9)
+    Presentation,
+    /// Instagram post (1:1)
+    InstagramPost,
+    /// Instagram story (9:16)
+    InstagramStory,
+    /// Facebook post (1.91:1)
+    FacebookPost,
+    /// Facebook cover (1.91:1)
+    FacebookCover,
+    /// YouTube thumbnail (16:9)
+    YoutubeThumbnail,
+    /// A4 document
+    A4Document,
+    /// US letter document
+    UsLetterDocument,
+    /// Logo (1:1)
+    Logo,
+    /// Business card
+    BusinessCard,
+    /// Poster (2:3)
+    Poster,
+    /// Flyer (8.5:11)
+    Flyer,
+}
+
+/// Ownership filter for designs
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum OwnershipType {
+    /// Any designs (owned or shared)
+    Any,
+    /// Only owned designs
+    Owned,
+    /// Only shared designs
+    Shared,
+}
+
+/// Sort order for designs
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SortByType {
+    /// Sort by relevance
+    Relevance,
+    /// Sort by modified date (descending)
+    ModifiedDescending,
+    /// Sort by modified date (ascending)
+    ModifiedAscending,
+    /// Sort by title (descending)
+    TitleDescending,
+    /// Sort by title (ascending)
+    TitleAscending,
 }
 
 /// Brand template metadata

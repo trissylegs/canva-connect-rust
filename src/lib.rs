@@ -70,6 +70,10 @@
 //!   - Get asset metadata and thumbnails  
 //!   - Update asset names and tags
 //!   - Delete assets from library
+//! - **[`endpoints::designs`]** - Create and manage Canva designs
+//!   - List user's designs with search and filtering
+//!   - Get design metadata and URLs
+//!   - Create new designs from presets or custom dimensions
 //! - **[`endpoints::user`]** - User profile and account information
 //!   - Get user profile details
 //!   - Check user capabilities and features
@@ -78,7 +82,6 @@
 //! ### Enterprise Endpoints (Coming Soon)
 //! - **Brand Templates** - Work with brand templates and corporate designs
 //! - **Autofill** - Automatically populate templates with data
-//! - **Designs** - Create, modify, and manage Canva designs
 //! - **Folders** - Organize content in folders and collections
 //! - **Comments** - Add and manage comments on designs
 //! - **Exports** - Export designs to various formats (PDF, PNG, etc.)
@@ -136,6 +139,30 @@
 //! # }
 //! ```
 //!
+//! ### Create a Design
+//!
+//! ```rust,no_run
+//! use canva_connect::{Client, auth::AccessToken};
+//! use canva_connect::models::{CreateDesignRequest, DesignTypeInput, PresetDesignTypeInput, PresetDesignTypeName};
+//!
+//! # #[tokio::main]
+//! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! let client = Client::new(AccessToken::new("token"));
+//!
+//! // Create a presentation design
+//! let request = CreateDesignRequest {
+//!     design_type: Some(DesignTypeInput::Preset(PresetDesignTypeInput {
+//!         design_type: PresetDesignTypeName::Presentation,
+//!     })),
+//!     title: Some("My Presentation".to_string()),
+//!     asset_id: None,
+//! };
+//! let design = client.designs().create(request).await?;
+//! println!("Created design: {}", design.design.id);
+//! # Ok(())
+//! # }
+//! ```
+//!
 //! ### Get User Profile
 //!
 //! ```rust,no_run
@@ -157,6 +184,7 @@
 //! - [`examples/url_asset_upload.rs`] - URL-based asset upload with metadata updates
 //! - [`examples/user_profile.rs`] - User profile and capabilities demonstration
 //! - [`examples/observability.rs`] - OpenTelemetry tracing integration
+//! - Design examples (coming soon) - Create and manage designs with various templates
 
 pub mod auth;
 pub mod client;
