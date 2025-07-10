@@ -143,7 +143,7 @@
 //!
 //! ```rust,no_run
 //! use canva_connect::{Client, auth::AccessToken};
-//! use canva_connect::models::{CreateDesignRequest, DesignTypeInput, PresetDesignTypeInput, PresetDesignTypeName};
+//! use canva_connect::models::{CreateDesignRequest, DesignTypeInput, PresetDesignTypeName};
 //!
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -151,9 +151,9 @@
 //!
 //! // Create a presentation design
 //! let request = CreateDesignRequest {
-//!     design_type: Some(DesignTypeInput::Preset(PresetDesignTypeInput {
-//!         design_type: PresetDesignTypeName::Presentation,
-//!     })),
+//!     design_type: Some(DesignTypeInput::Preset {
+//!         name: PresetDesignTypeName::Presentation,
+//!     }),
 //!     title: Some("My Presentation".to_string()),
 //!     asset_id: None,
 //! };

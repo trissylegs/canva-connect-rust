@@ -12,7 +12,7 @@
 //!
 //! ```rust,no_run
 //! use canva_connect::{Client, auth::AccessToken};
-//! use canva_connect::models::{CreateDesignRequest, DesignTypeInput, PresetDesignTypeInput, PresetDesignTypeName};
+//! use canva_connect::models::{CreateDesignRequest, DesignTypeInput, PresetDesignTypeName};
 //!
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -25,9 +25,9 @@
 //!
 //! // Create a new presentation
 //! let create_request = CreateDesignRequest {
-//!     design_type: Some(DesignTypeInput::Preset(PresetDesignTypeInput {
-//!         design_type: PresetDesignTypeName::Presentation,
-//!     })),
+//!     design_type: Some(DesignTypeInput::Preset {
+//!         name: PresetDesignTypeName::Presentation,
+//!     }),
 //!     title: Some("My Presentation".to_string()),
 //!     asset_id: None,
 //! };
@@ -187,8 +187,7 @@ impl DesignsApi {
     /// ```rust,no_run
     /// use canva_connect::{Client, auth::AccessToken};
     /// use canva_connect::models::{
-    ///     CreateDesignRequest, DesignTypeInput, PresetDesignTypeInput,
-    ///     PresetDesignTypeName, CustomDesignTypeInput
+    ///     CreateDesignRequest, DesignTypeInput, PresetDesignTypeName
     /// };
     ///
     /// # #[tokio::main]
@@ -198,9 +197,9 @@ impl DesignsApi {
     ///
     /// // Create a presentation
     /// let request = CreateDesignRequest {
-    ///     design_type: Some(DesignTypeInput::Preset(PresetDesignTypeInput {
-    ///         design_type: PresetDesignTypeName::Presentation,
-    ///     })),
+    ///     design_type: Some(DesignTypeInput::Preset {
+    ///         name: PresetDesignTypeName::Presentation,
+    ///     }),
     ///     title: Some("My Presentation".to_string()),
     ///     asset_id: None,
     /// };
@@ -208,10 +207,10 @@ impl DesignsApi {
     ///
     /// // Create a custom-sized design
     /// let custom_request = CreateDesignRequest {
-    ///     design_type: Some(DesignTypeInput::Custom(CustomDesignTypeInput {
+    ///     design_type: Some(DesignTypeInput::Custom {
     ///         width: 800,
     ///         height: 600,
-    ///     })),
+    ///     }),
     ///     title: Some("Custom Design".to_string()),
     ///     asset_id: None,
     /// };

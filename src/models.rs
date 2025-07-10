@@ -136,61 +136,34 @@ pub struct GetDesignResponse {
     pub design: Design,
 }
 
-/// Design type input for creating designs
+/// Design type input for creating designs (tagged union)
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
+#[serde(tag = "type", rename_all = "lowercase")]
 pub enum DesignTypeInput {
     /// Preset design type
-    Preset(PresetDesignTypeInput),
+    Preset {
+        /// Preset design type name
+        name: PresetDesignTypeName,
+    },
     /// Custom design type
-    Custom(CustomDesignTypeInput),
-}
-
-/// Preset design type configuration
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PresetDesignTypeInput {
-    /// Preset design type name
-    #[serde(rename = "type")]
-    pub design_type: PresetDesignTypeName,
-}
-
-/// Custom design type configuration
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CustomDesignTypeInput {
-    /// Design width in pixels
-    pub width: u32,
-    /// Design height in pixels
-    pub height: u32,
+    Custom {
+        /// Design width in pixels
+        width: u32,
+        /// Design height in pixels
+        height: u32,
+    },
 }
 
 /// Preset design type names
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum PresetDesignTypeName {
-    /// Presentation (16:9)
+    /// Document
+    Doc,
+    /// Whiteboard
+    Whiteboard,
+    /// Presentation
     Presentation,
-    /// Instagram post (1:1)
-    InstagramPost,
-    /// Instagram story (9:16)
-    InstagramStory,
-    /// Facebook post (1.91:1)
-    FacebookPost,
-    /// Facebook cover (1.91:1)
-    FacebookCover,
-    /// YouTube thumbnail (16:9)
-    YoutubeThumbnail,
-    /// A4 document
-    A4Document,
-    /// US letter document
-    UsLetterDocument,
-    /// Logo (1:1)
-    Logo,
-    /// Business card
-    BusinessCard,
-    /// Poster (2:3)
-    Poster,
-    /// Flyer (8.5:11)
-    Flyer,
 }
 
 /// Ownership filter for designs

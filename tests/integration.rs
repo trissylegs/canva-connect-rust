@@ -343,8 +343,7 @@ async fn test_asset_error_handling() {
 
 // Designs API integration tests
 use canva_connect::models::{
-    CreateDesignRequest, CustomDesignTypeInput, DesignTypeInput, OwnershipType,
-    PresetDesignTypeInput, PresetDesignTypeName, SortByType,
+    CreateDesignRequest, DesignTypeInput, OwnershipType, PresetDesignTypeName, SortByType,
 };
 
 #[tokio::test]
@@ -399,9 +398,9 @@ async fn test_create_and_get_design() {
 
     // Create a new presentation design
     let create_request = CreateDesignRequest {
-        design_type: Some(DesignTypeInput::Preset(PresetDesignTypeInput {
-            design_type: PresetDesignTypeName::Presentation,
-        })),
+        design_type: Some(DesignTypeInput::Preset {
+            name: PresetDesignTypeName::Presentation,
+        }),
         title: Some("Integration Test Presentation".to_string()),
         asset_id: None,
     };
@@ -451,10 +450,10 @@ async fn test_create_custom_design() {
 
     // Create a custom-sized design
     let create_request = CreateDesignRequest {
-        design_type: Some(DesignTypeInput::Custom(CustomDesignTypeInput {
+        design_type: Some(DesignTypeInput::Custom {
             width: 800,
             height: 600,
-        })),
+        }),
         title: Some("Custom Integration Test Design".to_string()),
         asset_id: None,
     };
