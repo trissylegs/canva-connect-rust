@@ -21,7 +21,7 @@
 //!
 //! // List designs
 //! let designs = designs_api.list(None, None, None, None).await?;
-//! println!("Found {} designs", designs.designs.len());
+//! println!("Found {} designs", designs.items.len());
 //!
 //! // Create a new presentation
 //! let create_request = CreateDesignRequest {

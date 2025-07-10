@@ -359,10 +359,10 @@ async fn test_list_designs() {
         .await
         .expect("Failed to list designs");
 
-    println!("✅ Listed {} designs", designs.designs.len());
+    println!("✅ Listed {} designs", designs.items.len());
 
     // Verify structure
-    for design in &designs.designs {
+    for design in &designs.items {
         assert!(!design.id.is_empty());
         assert!(!design.urls.edit_url.is_empty());
         assert!(!design.urls.view_url.is_empty());
@@ -385,7 +385,7 @@ async fn test_list_designs() {
 
     println!(
         "✅ Listed {} filtered designs",
-        filtered_designs.designs.len()
+        filtered_designs.items.len()
     );
 
     rate_limit_delay().await;

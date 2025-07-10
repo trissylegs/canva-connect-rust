@@ -106,7 +106,7 @@ pub struct ListDesignsRequest {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GetListDesignResponse {
     /// List of designs
-    pub designs: Vec<Design>,
+    pub items: Vec<Design>,
     /// Continuation token for next page
     pub continuation: Option<String>,
 }
