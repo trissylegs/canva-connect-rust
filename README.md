@@ -23,7 +23,7 @@ tokio = { version = "1.0", features = ["full"] }
 
 ## Quick Start
 
-```rust,no_run
+```rust,skt-connect,no_run
 use canva_connect::{Client, auth::AccessToken};
 
 #[tokio::main]
@@ -49,7 +49,7 @@ This library supports OAuth 2.0 authentication. You'll need to:
 
 ### OAuth Flow Example
 
-```rust,no_run
+```rust,skt-connect,no_run
 use canva_connect::auth::{OAuthClient, OAuthConfig, Scope};
 use canva_connect::{Client, auth::AccessToken};
 
@@ -83,7 +83,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ### Upload an Asset from File
 
-```rust,no_run
+```rust,skt-connect,no_run
 use canva_connect::{Client, auth::AccessToken};
 use canva_connect::endpoints::assets::AssetUploadMetadata;
 use std::fs;
@@ -111,7 +111,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ### Upload an Asset from URL
 
-```rust,no_run
+```rust,skt-connect,no_run
 use canva_connect::{Client, auth::AccessToken};
 use canva_connect::endpoints::assets::CreateUrlAssetUploadJobRequest;
 
@@ -134,7 +134,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ### Get Asset Details
 
-```rust,no_run
+```rust,skt-connect,no_run
 use canva_connect::{Client, auth::AccessToken};
 
 #[tokio::main]
@@ -236,14 +236,13 @@ Currently implemented endpoints:
 
 The library uses a comprehensive error system:
 
-```rust,no_run
-use canva_connect::{Client, auth::AccessToken, Error};
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::new(AccessToken::new("your-access-token"));
+```rust
+
+use canva_connect::{Client, auth::AccessToken, Error};
+let client = Client::new(AccessToken::new("your-access-token"));
     
-    match client.assets().get("invalid-id").await {
+match client.assets().get("invalid-id").await {
         Ok(asset) => println!("Asset: {}", asset.name),
         Err(Error::Api { code, message }) => {
             println!("API error {}: {}", code, message);
@@ -256,14 +255,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
     Ok(())
-}
+
 ```
 
 ## Rate Limiting
 
 The client includes built-in rate limiting to respect API quotas:
 
-```rust,no_run
+```rust,skt-connect,no_run
 use canva_connect::{Client, auth::AccessToken, rate_limit::ApiRateLimiter};
 
 # fn main() {
