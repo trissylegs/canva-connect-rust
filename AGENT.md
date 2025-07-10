@@ -1,10 +1,11 @@
 # AGENT.md - Canva Connect Rust Client
 
 ## Project Structure
-- `public-api.yml` - OpenAPI 3.0 specification for Canva Connect API
+- `public-api.json` - OpenAPI 3.0 specification for Canva Connect API (JSON format for easier searching with `jq`)
 - `src/` - Rust client library source code
 - `examples/` - Usage examples
 - `scripts/` - Development scripts
+- `tests/` - Unit and integration tests
 - `Cargo.toml` - Rust project configuration
 
 ## Build/Test Commands
@@ -79,12 +80,30 @@ Individual commands:
 - Use `#[derive(Debug, Clone)]` for most data structures
 - Implement comprehensive error handling with custom error types
 
+## API Specification
+The `public-api.json` file contains the complete OpenAPI 3.0 specification for the Canva Connect API. You can search it efficiently using `jq`:
+
+```bash
+# Find all endpoint paths
+jq '.paths | keys[]' public-api.json
+
+# Find design-related endpoints
+jq '.paths | keys[] | select(contains("design"))' public-api.json
+
+# Get schema for a specific model
+jq '.components.schemas.Asset' public-api.json
+
+# Find all schemas containing "design"
+jq '.components.schemas | keys[] | select(contains("Design"))' public-api.json
+```
+
 ## API Implementation Status
 - ✅ Core client with OAuth 2.0 authentication
 - ✅ Rate limiting and error handling
 - ✅ Assets API (upload, get, update, delete)
 - ✅ User API (profile, capabilities, identification)
 - ✅ Observability (OpenTelemetry tracing with feature flag)
+- ✅ Integration tests with automatic cleanup and rate limiting
 - 🚧 Other endpoints (stubs created, need implementation)
 
 ## Dependencies
