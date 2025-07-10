@@ -379,7 +379,7 @@ pub struct CommentReply {
 
 /// Export format
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "UPPERCASE")]
+#[serde(rename_all = "lowercase")]
 pub enum ExportFormat {
     /// PNG format
     Png,
@@ -401,12 +401,10 @@ pub enum ExportFormat {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ExportQuality {
-    /// Low quality
-    Low,
-    /// Medium quality
-    Medium,
-    /// High quality
-    High,
+    /// Regular quality
+    Regular,
+    /// Pro quality
+    Pro,
 }
 
 /// Job status
@@ -504,12 +502,12 @@ pub struct AutofillResult {
 
 /// Dataset filter
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
 pub enum DatasetFilter {
-    /// Only items with datasets
-    WithDataset,
-    /// Only items without datasets
-    WithoutDataset,
-    /// All items
-    All,
+    /// Any items
+    Any,
+    /// Only items with non-empty datasets
+    NonEmpty,
+    /// Only items with empty datasets
+    Empty,
 }
