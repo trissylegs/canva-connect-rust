@@ -1,34 +1,47 @@
-# AGENT.md - Canva Connect API Workspace
+# AGENT.md - Canva Connect Rust Client
 
 ## Project Structure
 - `public-api.yml` - OpenAPI 3.0 specification for Canva Connect API
-- This is an API specification workspace focused on the Canva Connect REST API
+- `src/` - Rust client library source code
+- `examples/` - Usage examples
+- `Cargo.toml` - Rust project configuration
 
-## API Overview
-- **Base URL**: `https://api.canva.com/rest`
-- **Version**: OpenAPI 3.0.0
-- **Authentication**: OAuth 2.0 with authorization code flow
-- **Rate Limiting**: Per-client-user limits specified per endpoint
+## Build/Test Commands
+- `cargo check` - Check code for compilation errors
+- `cargo build` - Build the library
+- `cargo test` - Run unit tests
+- `cargo doc` - Generate documentation
+- `cargo run --example basic_usage -- --token TOKEN` - Run basic usage example
+- `cargo run --example asset_upload -- --token TOKEN --file path/to/file` - Run asset upload example
 
-## API Categories
-- **Assets**: Upload, manage, and retrieve user content library assets
-- **Autofill**: Enterprise feature for populating brand templates with data
-- **Brand Templates**: Enterprise templates for consistent branding
-- **Comments**: Design collaboration and feedback system
-- **Designs**: Create, manage, and manipulate Canva designs
-- **Exports**: Export designs to various formats
-- **Folders**: Organize and manage design collections
-- **OAuth**: Authentication and authorization flows
-- **Users**: User profile and account information
+## Codebase Structure
+- `src/lib.rs` - Main library entry point
+- `src/client.rs` - HTTP client implementation with rate limiting
+- `src/auth.rs` - OAuth 2.0 authentication flow
+- `src/error.rs` - Comprehensive error handling
+- `src/models.rs` - Data structures for API responses
+- `src/rate_limit.rs` - Rate limiting implementation
+- `src/endpoints/` - API endpoint implementations
+  - `assets.rs` - Assets API (fully implemented)
+  - `mod.rs` - Other endpoints (stub implementations)
 
-## Key Patterns
-- Asynchronous jobs for long-running operations (uploads, exports, autofill)
-- Pagination with continuation tokens for large result sets
-- Rate limiting with per-client-user quotas
-- Enterprise-only features require Canva Enterprise organization membership
-- Preview APIs marked with warnings about breaking changes
+## Code Style
+- Use `async/await` for all API calls
+- Return `Result<T, Error>` for fallible operations
+- Use `serde` for JSON serialization/deserialization
+- Follow Rust naming conventions (snake_case for functions, PascalCase for types)
+- Use `#[derive(Debug, Clone)]` for most data structures
+- Implement comprehensive error handling with custom error types
 
-## Security & Compliance
-- OAuth scopes control access to different API capabilities
-- Rate limiting enforced per client and user combination
-- Enterprise features restricted to organization members
+## API Implementation Status
+- ✅ Core client with OAuth 2.0 authentication
+- ✅ Rate limiting and error handling
+- ✅ Assets API (upload, list, get, update, delete)
+- 🚧 Other endpoints (stubs created, need implementation)
+
+## Dependencies
+- `reqwest` - HTTP client with async support
+- `serde` - JSON serialization
+- `tokio` - Async runtime
+- `governor` - Rate limiting
+- `thiserror` - Error handling macros

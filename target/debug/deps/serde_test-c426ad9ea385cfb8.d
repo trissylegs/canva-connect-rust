@@ -1,0 +1,11 @@
+/Users/triss/work/hackathon2025/target/debug/deps/libserde_test-c426ad9ea385cfb8.rmeta: /Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/lib.rs /Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/assert.rs /Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/configure.rs /Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/de.rs /Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/error.rs /Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/ser.rs /Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/token.rs
+
+/Users/triss/work/hackathon2025/target/debug/deps/serde_test-c426ad9ea385cfb8.d: /Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/lib.rs /Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/assert.rs /Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/configure.rs /Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/de.rs /Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/error.rs /Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/ser.rs /Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/token.rs
+
+/Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/lib.rs:
+/Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/assert.rs:
+/Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/configure.rs:
+/Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/de.rs:
+/Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/error.rs:
+/Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/ser.rs:
+/Users/triss/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_test-1.0.177/src/token.rs:

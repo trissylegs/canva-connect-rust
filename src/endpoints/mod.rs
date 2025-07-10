@@ -1,19 +1,32 @@
 //! API endpoint implementations
 
 pub mod assets;
-pub mod autofill;
-pub mod brand_templates;
-pub mod comments;
-pub mod designs;
-pub mod exports;
-pub mod folders;
-pub mod user;
 
 pub use assets::AssetsApi;
-pub use autofill::AutofillApi;
-pub use brand_templates::BrandTemplatesApi;
-pub use comments::CommentsApi;
-pub use designs::DesignsApi;
-pub use exports::ExportsApi;
-pub use folders::FoldersApi;
-pub use user::UserApi;
+
+// Stub implementations for other endpoints
+use crate::client::Client;
+
+macro_rules! stub_api {
+    ($name:ident) => {
+        #[derive(Debug, Clone)]
+        pub struct $name {
+            #[allow(dead_code)]
+            client: Client,
+        }
+
+        impl $name {
+            pub fn new(client: Client) -> Self {
+                Self { client }
+            }
+        }
+    };
+}
+
+stub_api!(AutofillApi);
+stub_api!(BrandTemplatesApi);
+stub_api!(CommentsApi);
+stub_api!(DesignsApi);
+stub_api!(ExportsApi);
+stub_api!(FoldersApi);
+stub_api!(UserApi);

@@ -33,6 +33,7 @@ async-trait = "0.1"
 futures = "0.3"
 governor = "0.6"
 nonzero_ext = "0.3"
+urlencoding = "2.1"
 
 [dev-dependencies]
 tokio-test = "0.4"
@@ -51,7 +52,3 @@ path = "examples/basic_usage.rs"
 [[example]]
 name = "asset_upload"
 path = "examples/asset_upload.rs"
-
-[[example]]
-name = "design_export"
-path = "examples/design_export.rs"

@@ -168,9 +168,7 @@ impl Client {
         }
 
         // Fallback to generic HTTP error
-        Err(Error::Http(reqwest::Error::from(
-            reqwest::ErrorKind::Request,
-        )))
+        Err(Error::Generic(format!("HTTP {} error", status)))
     }
 
     /// Get a JSON response from a path

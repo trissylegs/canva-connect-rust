@@ -1,0 +1,233 @@
+# Canva Connect Rust Client
+
+A Rust client library for the [Canva Connect API](https://www.canva.dev/docs/connect/) that provides a safe and ergonomic interface for interacting with Canva's design platform.
+
+## Features
+
+- **Async/await support** - Built on `tokio` and `reqwest`
+- **Type safety** - Strongly typed API with comprehensive error handling
+- **OAuth 2.0 authentication** - Full support for Canva's OAuth flow
+- **Rate limiting** - Built-in rate limiting to respect API quotas
+- **Async job handling** - Support for long-running operations like uploads and exports
+- **Enterprise features** - Support for brand templates and autofill APIs
+
+## Installation
+
+Add this to your `Cargo.toml`:
+
+```toml
+[dependencies]
+canva-connect = "0.1.0"
+tokio = { version = "1.0", features = ["full"] }
+```
+
+## Quick Start
+
+```rust
+use canva_connect::{Client, auth::AccessToken};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Create a client with your access token
+    let client = Client::new(AccessToken::new("your-access-token"));
+    
+    // List the user's assets
+    let assets = client.assets().list(None).await?;
+    println!("Found {} assets", assets.items.len());
+    
+    Ok(())
+}
+```
+
+## Authentication
+
+This library supports OAuth 2.0 authentication. You'll need to:
+
+1. Register your application with Canva to get a client ID and secret
+2. Implement the OAuth flow to get an access token
+3. Use the access token to create a client
+
+### OAuth Flow Example
+
+```rust
+use canva_connect::auth::{OAuthClient, OAuthConfig, Scope};
+
+// Configure OAuth
+let config = OAuthConfig::new(
+    "your-client-id",
+    "your-client-secret", 
+    "https://your-app.com/callback",
+    vec![Scope::AssetRead, Scope::AssetWrite]
+);
+
+let oauth_client = OAuthClient::new(config);
+
+// Get authorization URL
+let auth_url = oauth_client.authorization_url(Some("state123"))?;
+println!("Visit: {}", auth_url);
+
+// After user authorizes, exchange code for token
+let token_response = oauth_client.exchange_code("authorization-code").await?;
+let access_token = AccessToken::new(token_response.access_token);
+
+// Create API client
+let client = Client::new(access_token);
+```
+
+## Examples
+
+### Upload an Asset from File
+
+```rust
+use canva_connect::{Client, auth::AccessToken};
+use canva_connect::endpoints::assets::AssetUploadMetadata;
+use std::fs;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new(AccessToken::new("your-access-token"));
+    
+    // Read file
+    let file_data = fs::read("image.png")?;
+    
+    // Upload asset
+    let metadata = AssetUploadMetadata {
+        name: "My Image".to_string(),
+        tags: vec!["rust".to_string(), "upload".to_string()],
+    };
+    
+    let upload_job = client.assets().create_upload_job(file_data, metadata).await?;
+    let result = client.assets().wait_for_upload_job(&upload_job.id).await?;
+    
+    println!("Uploaded asset: {}", result.asset.id);
+    Ok(())
+}
+```
+
+### Upload an Asset from URL
+
+```rust
+use canva_connect::{Client, auth::AccessToken};
+use canva_connect::endpoints::assets::{AssetUploadMetadata, CreateUrlAssetUploadJobRequest};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new(AccessToken::new("your-access-token"));
+    
+    let request = CreateUrlAssetUploadJobRequest {
+        url: "https://example.com/image.png".to_string(),
+        upload_metadata: AssetUploadMetadata {
+            name: "Image from URL".to_string(),
+            tags: vec!["url-upload".to_string()],
+        },
+    };
+    
+    let upload_job = client.assets().create_url_upload_job(request).await?;
+    let result = client.assets().wait_for_url_upload_job(&upload_job.id).await?;
+    
+    println!("Uploaded asset: {}", result.asset.id);
+    Ok(())
+}
+```
+
+### List and Filter Assets
+
+```rust
+use canva_connect::{Client, auth::AccessToken};
+use canva_connect::endpoints::assets::ListAssetsOptions;
+use canva_connect::models::{OwnershipType, SortByType};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new(AccessToken::new("your-access-token"));
+    
+    // List all assets
+    let assets = client.assets().list(None).await?;
+    
+    // List with filtering
+    let filtered_assets = client.assets().list(Some(ListAssetsOptions {
+        query: Some("rust".to_string()),
+        ownership: Some(OwnershipType::Owned),
+        sort_by: Some(SortByType::CreatedDescending),
+        continuation: None,
+    })).await?;
+    
+    println!("Found {} filtered assets", filtered_assets.items.len());
+    Ok(())
+}
+```
+
+## Running Examples
+
+This crate includes several examples:
+
+```bash
+# Basic usage example
+cargo run --example basic_usage -- --token YOUR_ACCESS_TOKEN
+
+# Upload asset from file
+cargo run --example asset_upload -- --token YOUR_ACCESS_TOKEN --file path/to/image.png
+```
+
+## API Coverage
+
+Currently implemented endpoints:
+
+### Assets
+- ✅ List assets
+- ✅ Get asset details
+- ✅ Update asset
+- ✅ Delete asset
+- ✅ Upload asset (file)
+- ✅ Upload asset (URL)
+- ✅ Get upload job status
+
+### Coming Soon
+- Designs API
+- Folders API
+- Brand Templates API
+- Autofill API
+- Comments API
+- Exports API
+- User API
+
+## Error Handling
+
+The library uses a comprehensive error system:
+
+```rust
+use canva_connect::error::{Error, Result};
+
+match client.assets().get("invalid-id").await {
+    Ok(asset) => println!("Asset: {}", asset.name),
+    Err(Error::Api { code, message }) => {
+        println!("API error {}: {}", code, message);
+    }
+    Err(Error::Http(e)) => {
+        println!("HTTP error: {}", e);
+    }
+    Err(e) => {
+        println!("Other error: {}", e);
+    }
+}
+```
+
+## Rate Limiting
+
+The client includes built-in rate limiting to respect API quotas:
+
+```rust
+use canva_connect::{Client, auth::AccessToken, rate_limit::ApiRateLimiter};
+
+// Create client with custom rate limiter
+let rate_limiter = ApiRateLimiter::new(30); // 30 requests per minute
+let client = Client::with_rate_limiter(access_token, rate_limiter);
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT OR Apache-2.0 license.
