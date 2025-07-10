@@ -7,7 +7,7 @@
 //! Setup:
 //! 1. Copy .env.example to .env
 //! 2. Set CANVA_ACCESS_TOKEN in .env file with appropriate scopes
-//! 3. Run: cargo run --example url_asset_upload -- --url "https://example.com/image.jpg"
+//! 3. Run: cargo run --example url_asset_upload -- --url "https://rustacean.net/assets/rustacean-flat-happy.png"
 //!
 //! Alternative: Set IMAGE_URL environment variable
 //!
@@ -188,15 +188,15 @@ fn get_image_url_from_args_or_env() -> Result<String, Box<dyn std::error::Error>
     eprintln!("❌ No image URL provided!");
     eprintln!();
     eprintln!("Usage:");
-    eprintln!("  cargo run --example url_asset_upload -- --url \"https://example.com/image.jpg\"");
+    eprintln!("  cargo run --example url_asset_upload -- --url \"https://rustacean.net/assets/rustacean-flat-happy.png\"");
     eprintln!();
     eprintln!("Or set environment variable:");
-    eprintln!("  IMAGE_URL=\"https://example.com/image.jpg\"");
+    eprintln!("  IMAGE_URL=\"https://rustacean.net/assets/rustacean-flat-happy.png\"");
     eprintln!();
-    eprintln!("Example URLs to try:");
-    eprintln!("  https://picsum.photos/800/600");
-    eprintln!("  https://via.placeholder.com/300x200/0000FF/FFFFFF?text=Sample");
-    eprintln!("  https://httpbin.org/image/jpeg");
+    eprintln!("Example Rustacean URLs to try:");
+    eprintln!("  https://rustacean.net/assets/rustacean-flat-happy.png");
+    eprintln!("  https://rustacean.net/assets/rustacean-flat-gesture.png");
+    eprintln!("  https://rustacean.net/assets/cuddlyferris.png");
 
     Err("No image URL provided".into())
 }
