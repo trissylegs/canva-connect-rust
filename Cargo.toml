@@ -36,6 +36,15 @@ nonzero_ext = "0.3"
 urlencoding = "2.1"
 dotenv = "0.15"
 
+# Observability dependencies (optional)
+opentelemetry = { version = "0.21", optional = true }
+opentelemetry_sdk = { version = "0.21", optional = true, features = ["rt-tokio"] }
+opentelemetry-otlp = { version = "0.14", optional = true }
+tracing = { version = "0.1", optional = true }
+tracing-opentelemetry = { version = "0.22", optional = true }
+tracing-subscriber = { version = "0.3", optional = true, features = ["env-filter"] }
+reqwest-tracing = { version = "0.4", optional = true, features = ["opentelemetry_0_21"] }
+
 [dev-dependencies]
 tokio-test = "0.4"
 mockito = "1.2"
@@ -45,7 +54,12 @@ serde_test = "1.0"
 default = ["rustls-tls"]
 rustls-tls = ["reqwest/rustls-tls"]
 native-tls = ["reqwest/native-tls"]
+observability = ["opentelemetry", "opentelemetry_sdk", "opentelemetry-otlp", "tracing", "tracing-opentelemetry", "tracing-subscriber"]
 
 [[example]]
 name = "asset_upload"
 path = "examples/asset_upload.rs"
+
+[[example]]
+name = "observability"
+path = "examples/observability.rs"

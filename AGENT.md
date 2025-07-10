@@ -15,6 +15,7 @@
 - `cp .env.example .env` - Set up environment configuration
 - `cargo run --example asset_upload` - Run asset upload example (needs .env setup)
 - `cargo run --example user_profile` - Run user profile example (needs .env setup)
+- `cargo run --example observability --features observability` - Run observability example with tracing
 - `cargo run --example asset_upload -- --token TOKEN --file path/to/file` - Run with CLI args
 - `cargo run --example user_profile -- --token TOKEN` - Run with CLI args
 
@@ -68,6 +69,7 @@ Individual commands:
 - ✅ Rate limiting and error handling
 - ✅ Assets API (upload, get, update, delete)
 - ✅ User API (profile, capabilities, identification)
+- ✅ Observability (OpenTelemetry tracing with feature flag)
 - 🚧 Other endpoints (stubs created, need implementation)
 
 ## Dependencies
@@ -76,3 +78,5 @@ Individual commands:
 - `tokio` - Async runtime
 - `governor` - Rate limiting
 - `thiserror` - Error handling macros
+- `opentelemetry` - Distributed tracing (optional, with `observability` feature)
+- `tracing` - Application-level tracing (optional, with `observability` feature)

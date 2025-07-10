@@ -101,6 +101,7 @@ pub mod client;
 pub mod endpoints;
 pub mod error;
 pub mod models;
+pub mod observability;
 pub mod rate_limit;
 
 pub use client::Client;

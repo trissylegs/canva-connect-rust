@@ -155,6 +155,15 @@ impl Client {
     }
 
     /// Make a request with optional body
+    #[cfg_attr(feature = "observability", tracing::instrument(
+        skip(self, body),
+        fields(
+            http.method = %method,
+            http.url = %format!("{}{}", self.base_url, path),
+            http.status_code = tracing::field::Empty,
+            canva.api.path = path,
+        )
+    ))]
     pub async fn request<T: serde::Serialize>(
         &self,
         method: reqwest::Method,
@@ -171,15 +180,27 @@ impl Client {
             request = request.json(body);
         }
 
+        #[cfg(feature = "observability")]
+        tracing::debug!("Sending HTTP request");
+
         let response = request.send().await?;
+
+        // Record response status in span
+        #[cfg(feature = "observability")]
+        tracing::Span::current().record("http.status_code", response.status().as_u16());
 
         // Update rate limit info from headers
         let _rate_limit_info = RateLimitInfo::from_headers(response.headers());
 
         // Handle API errors
         if !response.status().is_success() {
+            #[cfg(feature = "observability")]
+            tracing::warn!("HTTP request failed with status: {}", response.status());
             return self.handle_error_response(response).await;
         }
+
+        #[cfg(feature = "observability")]
+        tracing::debug!("HTTP request completed successfully");
 
         Ok(response)
     }

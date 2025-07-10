@@ -43,6 +43,7 @@ impl UserApi {
     /// Get basic user identification (user ID and team ID)
     ///
     /// **Required OAuth scope:** None (always accessible)
+    #[cfg_attr(feature = "observability", tracing::instrument(skip(self)))]
     pub async fn get_me(&self) -> Result<TeamUserSummary> {
         let response: UsersMeResponse = self.client.get_json("/v1/users/me").await?;
         Ok(response.team_user)
@@ -51,6 +52,7 @@ impl UserApi {
     /// Get user profile information
     ///
     /// **Required OAuth scope:** `profile:read`
+    #[cfg_attr(feature = "observability", tracing::instrument(skip(self)))]
     pub async fn get_profile(&self) -> Result<UserProfile> {
         let response: UserProfileResponse = self.client.get_json("/v1/users/me/profile").await?;
         Ok(response.profile)

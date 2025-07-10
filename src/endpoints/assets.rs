@@ -77,6 +77,12 @@ impl AssetsApi {
     /// Create an asset upload job
     ///
     /// **Required OAuth scope:** `asset:write`
+    #[cfg_attr(feature = "observability", tracing::instrument(
+        skip(self, file_data),
+        fields(
+            canva.asset.size_bytes = file_data.len(),
+        )
+    ))]
     pub async fn create_upload_job(
         &self,
         file_data: Vec<u8>,
