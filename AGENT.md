@@ -13,10 +13,10 @@
 - `cargo test` - Run unit tests
 - `cargo doc` - Generate documentation
 - `cp .env.example .env` - Set up environment configuration
-- `cargo run --example basic_usage` - Run basic usage example (needs .env setup)
 - `cargo run --example asset_upload` - Run asset upload example (needs .env setup)
-- `cargo run --example basic_usage -- --token TOKEN` - Run with CLI args instead of .env
+- `cargo run --example user_profile` - Run user profile example (needs .env setup)
 - `cargo run --example asset_upload -- --token TOKEN --file path/to/file` - Run with CLI args
+- `cargo run --example user_profile -- --token TOKEN` - Run with CLI args
 
 ## Development Scripts
 - `./scripts/setup.sh` - One-time setup script for development environment
@@ -66,7 +66,8 @@ Individual commands:
 ## API Implementation Status
 - ✅ Core client with OAuth 2.0 authentication
 - ✅ Rate limiting and error handling
-- ✅ Assets API (upload, list, get, update, delete)
+- ✅ Assets API (upload, get, update, delete)
+- ✅ User API (profile, capabilities, identification)
 - 🚧 Other endpoints (stubs created, need implementation)
 
 ## Dependencies

@@ -81,6 +81,11 @@ impl Client {
         AssetsApi::new(self.clone())
     }
 
+    /// Get the user API
+    pub fn user(&self) -> UserApi {
+        UserApi::new(self.clone())
+    }
+
     /// Get the designs API
     pub fn designs(&self) -> DesignsApi {
         DesignsApi::new(self.clone())
@@ -109,11 +114,6 @@ impl Client {
     /// Get the exports API
     pub fn exports(&self) -> ExportsApi {
         ExportsApi::new(self.clone())
-    }
-
-    /// Get the user API
-    pub fn user(&self) -> UserApi {
-        UserApi::new(self.clone())
     }
 
     /// Make a GET request

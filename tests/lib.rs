@@ -7,3 +7,4 @@ mod errors;
 mod models;
 mod rate_limit;
 mod simple_tests;
+mod user;

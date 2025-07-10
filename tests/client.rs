@@ -39,6 +39,7 @@ fn test_client_endpoints_available() {
 
     // Test that all expected endpoints are available
     let _assets = client.assets();
+    let _user = client.user();
     let _designs = client.designs();
     let _folders = client.folders();
     let _brand_templates = client.brand_templates();
