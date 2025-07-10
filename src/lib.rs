@@ -60,6 +60,29 @@
 //! # }
 //! ```
 //!
+//! ## API Reference
+//!
+//! This client provides access to all major Canva Connect API endpoints:
+//!
+//! ### Core Endpoints
+//! - **[`endpoints::assets`]** - Upload, manage, and retrieve design assets
+//!   - Upload assets from files or URLs
+//!   - Get asset metadata and thumbnails  
+//!   - Update asset names and tags
+//!   - Delete assets from library
+//! - **[`endpoints::user`]** - User profile and account information
+//!   - Get user profile details
+//!   - Check user capabilities and features
+//!   - User identification and verification
+//!
+//! ### Enterprise Endpoints (Coming Soon)
+//! - **Brand Templates** - Work with brand templates and corporate designs
+//! - **Autofill** - Automatically populate templates with data
+//! - **Designs** - Create, modify, and manage Canva designs
+//! - **Folders** - Organize content in folders and collections
+//! - **Comments** - Add and manage comments on designs
+//! - **Exports** - Export designs to various formats (PDF, PNG, etc.)
+//!
 //! ## OAuth Scopes
 //!
 //! Different API operations require different OAuth scopes. See [`auth::scopes`] for
@@ -74,7 +97,7 @@
 //!
 //! ## Examples
 //!
-//! ### Asset Upload
+//! ### Asset Upload from File
 //!
 //! ```rust,no_run
 //! use canva_connect::{Client, auth::AccessToken, endpoints::assets::AssetUploadMetadata};
@@ -94,7 +117,46 @@
 //! # }
 //! ```
 //!
-//! For more examples, see the `examples/` directory in the repository.
+//! ### Asset Upload from URL
+//!
+//! ```rust,no_run
+//! use canva_connect::{Client, auth::AccessToken, endpoints::assets::CreateUrlAssetUploadJobRequest};
+//!
+//! # #[tokio::main]
+//! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! let client = Client::new(AccessToken::new("token"));
+//!
+//! // Upload from URL
+//! let request = CreateUrlAssetUploadJobRequest {
+//!     url: "https://example.com/image.png".to_string(),
+//!     name: "My Image".to_string(),
+//! };
+//! let job = client.assets().create_url_upload_job(request).await?;
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ### Get User Profile
+//!
+//! ```rust,no_run
+//! use canva_connect::{Client, auth::AccessToken};
+//!
+//! # #[tokio::main]
+//! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! let client = Client::new(AccessToken::new("token"));
+//!
+//! // Get user profile
+//! let profile = client.user().get_profile().await?;
+//! println!("User: {}", profile.display_name);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! For more comprehensive examples, see the `examples/` directory in the repository:
+//! - [`examples/asset_upload.rs`] - File-based asset upload with progress tracking
+//! - [`examples/url_asset_upload.rs`] - URL-based asset upload with metadata updates
+//! - [`examples/user_profile.rs`] - User profile and capabilities demonstration
+//! - [`examples/observability.rs`] - OpenTelemetry tracing integration
 
 pub mod auth;
 pub mod client;
