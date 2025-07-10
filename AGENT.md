@@ -25,20 +25,34 @@
 ## Integration Tests
 Integration tests make real API calls to Canva Connect and require valid credentials:
 
-- `CANVA_INTEGRATION_TESTS=1 cargo test --test integration` - Run integration tests only
+- `./scripts/integration-tests.sh` - Run all integration tests (loads .env automatically)
+- `./scripts/integration-tests.sh test_name` - Run specific integration test
+- `CANVA_INTEGRATION_TESTS=1 cargo test --test integration` - Manual method
 - `CANVA_INTEGRATION_TESTS=1 cargo test` - Run all tests including integration tests
 
 **Setup for integration tests:**
-1. Set `CANVA_ACCESS_TOKEN` environment variable with a valid token
-2. Set `CANVA_INTEGRATION_TESTS=1` to enable the tests
-3. Tests will automatically clean up any assets they create
-4. Tests respect rate limits with built-in delays
+1. Copy `.env.example` to `.env`: `cp .env.example .env`
+2. Add your Canva Connect API access token to `.env`: `CANVA_ACCESS_TOKEN=your-token`
+3. Run integration tests: `./scripts/integration-tests.sh`
+4. Tests will automatically clean up any assets they create
+5. Tests respect rate limits with built-in delays
+
+**Available integration tests:**
+- `test_get_user_profile` - Test user profile retrieval
+- `test_get_user_capabilities` - Test user capabilities checking
+- `test_url_asset_upload_workflow` - Test complete asset upload workflow
+- `test_asset_error_handling` - Test asset API error handling
+- `test_list_designs` - Test design listing with filters
+- `test_create_and_get_design` - Test design creation and retrieval
+- `test_create_custom_design` - Test custom dimension design creation
+- `test_design_error_handling` - Test design API error handling
 
 ## Development Scripts
 - `./scripts/setup.sh` - One-time setup script for development environment
 - `./scripts/check.sh` - Run all CI checks locally (formatting, clippy, tests, build)
 - `./scripts/fix.sh` - Auto-fix formatting and clippy issues
 - `./scripts/docs.sh` - Generate Rust documentation (use `--open` to open in browser)
+- `./scripts/integration-tests.sh` - Run integration tests with automatic .env loading
 - `./scripts/pre-commit.sh` - Pre-commit hook logic (version controlled)
 - **Pre-commit hook**: Automatically runs all CI checks before each commit
 
