@@ -23,7 +23,7 @@
 
 use canva_connect::{
     auth::AccessToken,
-    endpoints::assets::{AssetUploadMetadata, CreateUrlAssetUploadJobRequest},
+    endpoints::assets::{CreateUrlAssetUploadJobRequest, UpdateAssetRequest},
     Client,
 };
 use std::{env, io::Write};
@@ -68,19 +68,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(feature = "observability")]
     info!("Starting URL asset upload process");
 
-    // Extract filename from URL for metadata
+    // Extract filename from URL
     let filename = extract_filename_from_url(&image_url);
-    let metadata = AssetUploadMetadata::new(
-        &filename,
-        vec!["api-upload".to_string(), "url-source".to_string()],
-    );
 
     println!("🚀 Creating URL upload job...");
 
     // Create URL upload job
     let request = CreateUrlAssetUploadJobRequest {
         url: image_url.clone(),
-        upload_metadata: metadata,
+        name: filename,
     };
 
     let job = match assets_api.create_url_upload_job(request).await {
@@ -125,11 +121,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    // Display asset information
+    // Display initial asset information
     println!("🎉 Asset Upload Complete!");
     println!("========================");
     println!();
-    println!("📄 Asset Details:");
+    println!("📄 Initial Asset Details:");
     println!("   Asset ID: {}", asset.id);
     println!("   Name: {}", asset.name);
     println!("   Tags: {:?}", asset.tags);
@@ -144,11 +140,47 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("   Thumbnail URL: {}", thumbnail.url);
     }
 
+    // Update the asset with a better name and tags
+    println!();
+    println!("🔄 Updating asset with better metadata...");
+
+    let update_request = UpdateAssetRequest {
+        name: Some("🦀 Happy Rustacean Mascot".to_string()),
+        tags: Some(vec![
+            "rust".to_string(),
+            "mascot".to_string(),
+            "rustacean".to_string(),
+            "api-upload".to_string(),
+            "url-source".to_string(),
+        ]),
+    };
+
+    let updated_asset = match assets_api.update(&asset.id, update_request).await {
+        Ok(updated) => {
+            println!("   ✅ Asset updated successfully!");
+            updated
+        }
+        Err(e) => {
+            eprintln!("   ❌ Failed to update asset: {e}");
+            eprintln!("   ℹ️  Continuing with original asset...");
+            asset
+        }
+    };
+
+    // Display updated asset information
+    println!();
+    println!("📄 Updated Asset Details:");
+    println!("   Asset ID: {}", updated_asset.id);
+    println!("   Name: {}", updated_asset.name);
+    println!("   Tags: {:?}", updated_asset.tags);
+    println!("   Created: {}", updated_asset.created_at);
+    println!("   Updated: {}", updated_asset.updated_at);
+
     println!();
     println!("🔗 You can now use this asset in Canva designs!");
     println!(
         "   Asset ID '{}' can be referenced in other API calls",
-        asset.id
+        updated_asset.id
     );
 
     #[cfg(feature = "observability")]

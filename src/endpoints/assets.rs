@@ -212,8 +212,8 @@ impl AssetUploadMetadata {
 pub struct CreateUrlAssetUploadJobRequest {
     /// URL to upload from
     pub url: String,
-    /// Upload metadata
-    pub upload_metadata: AssetUploadMetadata,
+    /// A name for the asset (maximum 255 characters)
+    pub name: String,
 }
 
 /// Request to update an asset
