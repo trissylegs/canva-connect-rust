@@ -47,9 +47,5 @@ rustls-tls = ["reqwest/rustls-tls"]
 native-tls = ["reqwest/native-tls"]
 
 [[example]]
-name = "basic_usage"
-path = "examples/basic_usage.rs"
-
-[[example]]
 name = "asset_upload"
 path = "examples/asset_upload.rs"
