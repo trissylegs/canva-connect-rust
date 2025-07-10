@@ -256,6 +256,20 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ### Development
 
+#### Quick Setup
+
+For first-time setup, run the setup script:
+
+```bash
+./scripts/setup.sh
+```
+
+This will:
+- Configure git settings for optimal development
+- Install the pre-commit hook
+- Verify Rust toolchain (rustfmt, clippy)
+- Run initial checks to ensure everything works
+
 #### Running CI Checks Locally
 
 To avoid CI failures, run checks locally before committing:

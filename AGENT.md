@@ -19,9 +19,17 @@
 - `cargo run --example asset_upload -- --token TOKEN --file path/to/file` - Run with CLI args
 
 ## Development Scripts
+- `./scripts/setup.sh` - One-time setup script for development environment
 - `./scripts/check.sh` - Run all CI checks locally (formatting, clippy, tests, build)
 - `./scripts/fix.sh` - Auto-fix formatting and clippy issues
+- `./scripts/pre-commit.sh` - Pre-commit hook logic (version controlled)
 - **Pre-commit hook**: Automatically runs all CI checks before each commit
+
+## Quick Setup
+For new developers:
+```bash
+./scripts/setup.sh  # One-time setup
+```
 
 ## Local CI Checks
 Always run before committing to avoid CI failures:
