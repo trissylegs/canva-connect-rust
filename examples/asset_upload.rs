@@ -79,7 +79,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Read the file
     let file_data =
-        fs::read(&file_path).map_err(|e| format!("Failed to read file '{}': {}", file_path, e))?;
+        fs::read(&file_path).map_err(|e| format!("Failed to read file '{file_path}': {e}"))?;
 
     let file_name = Path::new(&file_path)
         .file_name()

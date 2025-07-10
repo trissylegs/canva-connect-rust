@@ -97,7 +97,7 @@ fn test_asset_upload_metadata_with_unicode_filename() {
 #[test]
 fn test_asset_upload_metadata_debug() {
     let metadata = AssetUploadMetadata::new("test.png", vec!["design".to_string()]);
-    let debug_str = format!("{:?}", metadata);
+    let debug_str = format!("{metadata:?}");
 
     assert!(debug_str.contains("AssetUploadMetadata"));
     assert!(debug_str.contains("name_base64"));

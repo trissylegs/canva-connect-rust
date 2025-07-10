@@ -51,8 +51,8 @@ fn test_error_type_properties() {
     let generic_error = Error::Generic("Something went wrong".to_string());
 
     // Errors should display correctly
-    assert!(format!("{}", auth_error).contains("Invalid token"));
-    assert!(format!("{}", generic_error).contains("Something went wrong"));
+    assert!(format!("{auth_error}").contains("Invalid token"));
+    assert!(format!("{generic_error}").contains("Something went wrong"));
 }
 
 #[test]

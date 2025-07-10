@@ -5,7 +5,7 @@ fn test_api_rate_limiter_creation() {
     let rate_limiter = ApiRateLimiter::default();
 
     // Should create successfully
-    assert!(format!("{:?}", rate_limiter).contains("ApiRateLimiter"));
+    assert!(format!("{rate_limiter:?}").contains("ApiRateLimiter"));
 }
 
 #[test]
@@ -13,7 +13,7 @@ fn test_api_rate_limiter_debug() {
     let limiter1 = ApiRateLimiter::default();
 
     // Should be able to debug print
-    assert!(format!("{:?}", limiter1).contains("ApiRateLimiter"));
+    assert!(format!("{limiter1:?}").contains("ApiRateLimiter"));
 }
 
 #[test]
@@ -22,7 +22,7 @@ fn test_rate_limiter_basic_operation() {
 
     // Should be able to create rate limiter
     // This test mainly verifies the API is accessible
-    assert!(format!("{:?}", rate_limiter).contains("ApiRateLimiter"));
+    assert!(format!("{rate_limiter:?}").contains("ApiRateLimiter"));
 }
 
 #[test]
@@ -59,7 +59,7 @@ fn test_rate_limit_info_debug() {
         limit: Some(100),
     };
 
-    let debug_str = format!("{:?}", info);
+    let debug_str = format!("{info:?}");
     assert!(debug_str.contains("remaining"));
 }
 

@@ -108,7 +108,7 @@ fn test_api_error_from_api_error_struct() {
 #[test]
 fn test_error_debug() {
     let error = Error::Auth("Test auth error".to_string());
-    let debug_str = format!("{:?}", error);
+    let debug_str = format!("{error:?}");
     assert!(debug_str.contains("Auth"));
     assert!(debug_str.contains("Test auth error"));
 }
