@@ -1,4 +1,36 @@
-//! API endpoint implementations
+//! API endpoint implementations for the Canva Connect API.
+//!
+//! This module contains the implementation for various Canva Connect API endpoints.
+//! Each endpoint provides strongly typed methods for interacting with specific
+//! parts of the Canva platform.
+//!
+//! ## Available Endpoints
+//!
+//! - [`assets`] - Upload, manage, and retrieve design assets
+//! - Designs - Create and manage Canva designs (coming soon)
+//! - Folders - Organize content in folders (coming soon)
+//! - Brand Templates - Work with brand templates (coming soon)
+//! - Autofill - Use autofill functionality (coming soon)
+//! - Comments - Add and manage comments (coming soon)
+//! - Exports - Export designs to various formats (coming soon)
+//! - User - User profile and account information (coming soon)
+//!
+//! ## Usage
+//!
+//! Access endpoints through the main [`Client`](crate::Client):
+//!
+//! ```rust,no_run
+//! use canva_connect::{Client, auth::AccessToken};
+//!
+//! # #[tokio::main]
+//! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! let client = Client::new(AccessToken::new("token"));
+//!
+//! // Access the assets endpoint
+//! let assets = client.assets();
+//! # Ok(())
+//! # }
+//! ```
 
 pub mod assets;
 

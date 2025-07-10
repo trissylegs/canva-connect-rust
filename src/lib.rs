@@ -12,6 +12,16 @@
 //! - **Async job handling** - Support for long-running operations like uploads and exports
 //! - **Enterprise features** - Support for brand templates and autofill APIs
 //!
+//! ## Installation
+//!
+//! Add this to your `Cargo.toml`:
+//!
+//! ```toml
+//! [dependencies]
+//! canva-connect = "0.1.0"
+//! tokio = { version = "1.0", features = ["full"] }
+//! ```
+//!
 //! ## Quick Start
 //!
 //! ```rust,no_run
@@ -32,6 +42,47 @@
 //!     Ok(())
 //! }
 //! ```
+//!
+//! ## Authentication
+//!
+//! The client supports OAuth 2.0 authentication flow:
+//!
+//! ```rust,no_run
+//! use canva_connect::auth::AccessToken;
+//!
+//! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! // From environment variable
+//! let token = AccessToken::new(&std::env::var("CANVA_ACCESS_TOKEN")?);
+//!
+//! // Or directly
+//! let token = AccessToken::new("your-access-token");
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Examples
+//!
+//! ### Asset Upload
+//!
+//! ```rust,no_run
+//! use canva_connect::{Client, auth::AccessToken, endpoints::assets::AssetUploadMetadata};
+//!
+//! # #[tokio::main]
+//! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! let client = Client::new(AccessToken::new("token"));
+//!
+//! // Upload an asset
+//! let metadata = AssetUploadMetadata::new("logo.png", vec!["branding".to_string()]);
+//! let job = client.assets().create_upload_job(vec![], metadata).await?;
+//!
+//! // Wait for completion
+//! let completed_job = client.assets().wait_for_upload_job(&job.id).await?;
+//! println!("Asset uploaded: {:?}", completed_job);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! For more examples, see the `examples/` directory in the repository.
 
 pub mod auth;
 pub mod client;

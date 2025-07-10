@@ -1,4 +1,20 @@
-//! Main client for the Canva Connect API
+//! HTTP client implementation for the Canva Connect API.
+//!
+//! This module provides the main [`Client`] struct that handles all API communication,
+//! including authentication, rate limiting, and endpoint access.
+//!
+//! ## Examples
+//!
+//! ```rust,no_run
+//! use canva_connect::{Client, auth::AccessToken};
+//!
+//! # #[tokio::main]
+//! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! let client = Client::new(AccessToken::new("your-token"));
+//! let assets_api = client.assets();
+//! # Ok(())
+//! # }
+//! ```
 
 use crate::{
     auth::AccessToken,
