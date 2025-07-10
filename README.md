@@ -176,11 +176,17 @@ This crate includes several examples that demonstrate how to use the library.
 
 3. **Run the examples:**
    ```bash
-   # Basic usage example (URL upload and listing)
-   cargo run --example basic_usage
+   # User profile and capabilities
+   cargo run --example user_profile
    
-   # Asset upload example (file upload)
+   # Asset upload from file
    cargo run --example asset_upload
+   
+   # Asset upload from URL
+   cargo run --example url_asset_upload
+   
+   # Design management (list, create, get)
+   cargo run --example designs
    ```
 
 ### Alternative: Command Line Arguments
@@ -188,11 +194,17 @@ This crate includes several examples that demonstrate how to use the library.
 You can also run examples with command line arguments instead of using `.env`:
 
 ```bash
-# Basic usage example
-cargo run --example basic_usage -- --token YOUR_ACCESS_TOKEN
+# User profile example
+cargo run --example user_profile -- --token YOUR_ACCESS_TOKEN
 
 # Upload asset from file
 cargo run --example asset_upload -- --token YOUR_ACCESS_TOKEN --file path/to/image.png
+
+# Upload asset from URL
+cargo run --example url_asset_upload -- --token YOUR_ACCESS_TOKEN --url "https://example.com/image.png"
+
+# Design management
+cargo run --example designs -- --token YOUR_ACCESS_TOKEN
 ```
 
 ## API Coverage
@@ -208,14 +220,22 @@ Currently implemented endpoints:
 - ✅ Upload asset (URL)
 - ✅ Get upload job status
 
+### Designs
+- ✅ List designs
+- ✅ Get design details
+- ✅ Create design (preset and custom)
+
+### User
+- ✅ Get user profile
+- ✅ Get user capabilities
+- ✅ Get user identification
+
 ### Coming Soon
-- Designs API
 - Folders API
 - Brand Templates API
 - Autofill API
 - Comments API
 - Exports API
-- User API
 
 ## Error Handling
 
