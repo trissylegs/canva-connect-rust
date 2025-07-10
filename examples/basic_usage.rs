@@ -14,8 +14,7 @@
 
 use canva_connect::{
     auth::AccessToken,
-    endpoints::assets::{AssetUploadMetadata, CreateUrlAssetUploadJobRequest, ListAssetsOptions},
-    models::SortByType,
+    endpoints::assets::{AssetUploadMetadata, CreateUrlAssetUploadJobRequest},
     Client,
 };
 use std::env;
@@ -51,10 +50,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     let url_upload_request = CreateUrlAssetUploadJobRequest {
         url: "https://images.unsplash.com/photo-1518837695005-2083093ee35b".to_string(),
-        upload_metadata: AssetUploadMetadata {
-            name: "Sample Image from Unsplash".to_string(),
-            tags: vec!["rust-example".to_string(), "url-upload".to_string()],
-        },
+        upload_metadata: AssetUploadMetadata::new(
+            "Sample Image from Unsplash",
+            vec!["rust-example".to_string(), "url-upload".to_string()],
+        ),
     };
 
     let upload_job = client
@@ -66,73 +65,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Wait for the upload to complete
     println!("⏳ Waiting for upload to complete...");
-    let result = client
+    let asset = client
         .assets()
         .wait_for_url_upload_job(&upload_job.id)
         .await?;
 
     println!("🎉 Upload completed successfully!");
-    println!("Asset ID: {}", result.asset.id);
-    println!("Asset Name: {}", result.asset.name);
-    println!("Asset Type: {:?}", result.asset.asset_type);
+    println!("Asset ID: {}", asset.id);
+    println!("Asset Name: {}", asset.name);
+    println!("Asset Type: {:?}", asset.asset_type);
 
-    // Example 2: List assets
-    println!("\n📋 Listing your assets...");
-    
-    let assets = client
-        .assets()
-        .list(Some(ListAssetsOptions {
-            query: None,
-            continuation: None,
-            ownership: None,
-            sort_by: Some(SortByType::CreatedDescending),
-        }))
-        .await?;
-
-    println!("Found {} assets:", assets.items.len());
-    for (i, asset) in assets.items.iter().take(10).enumerate() {
-        println!("  {}. {} ({})", i + 1, asset.name, asset.id);
-        if let Some(thumbnail) = &asset.thumbnail {
-            println!("     Thumbnail: {}x{}", thumbnail.width, thumbnail.height);
-        }
-    }
-
-    // Example 3: Get specific asset details
-    if let Some(first_asset) = assets.items.first() {
-        println!("\n🔍 Getting details for first asset...");
-        
-        let asset_details = client
-            .assets()
-            .get(&first_asset.id)
-            .await?;
-
-        println!("Asset Details:");
-        println!("  Name: {}", asset_details.name);
-        println!("  Type: {:?}", asset_details.asset_type);
-        println!("  Tags: {:?}", asset_details.tags);
-        println!("  Created: {}", asset_details.created_at);
-        println!("  Updated: {}", asset_details.updated_at);
-    }
-
-    // Example 4: Search assets
-    println!("\n🔍 Searching for assets with 'rust' tag...");
-    
-    let search_results = client
-        .assets()
-        .list(Some(ListAssetsOptions {
-            query: Some("rust".to_string()),
-            continuation: None,
-            ownership: None,
-            sort_by: Some(SortByType::CreatedDescending),
-        }))
-        .await?;
-
-    println!("Found {} assets matching 'rust':", search_results.items.len());
-    for (i, asset) in search_results.items.iter().take(5).enumerate() {
-        println!("  {}. {} ({})", i + 1, asset.name, asset.id);
-    }
-
-    println!("\n✅ Example completed successfully!");
+    println!("\n✅ Basic usage example completed successfully!");
 
     Ok(())
 }

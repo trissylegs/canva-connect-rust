@@ -12,7 +12,7 @@
 
 use canva_connect::{
     auth::AccessToken,
-    endpoints::assets::{AssetUploadMetadata, ListAssetsOptions},
+    endpoints::assets::AssetUploadMetadata,
     Client,
 };
 use std::env;
@@ -94,10 +94,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("✓ Read file: {} ({} bytes)", file_path, file_data.len());
 
     // Prepare upload metadata
-    let metadata = AssetUploadMetadata {
-        name: file_name.to_string(),
-        tags: vec!["rust-example".to_string(), "api-upload".to_string()],
-    };
+    let metadata = AssetUploadMetadata::new(
+        file_name,
+        vec!["rust-example".to_string(), "api-upload".to_string()],
+    );
 
     println!("✓ Prepared upload metadata");
 
@@ -112,38 +112,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Wait for the upload to complete
     println!("⏳ Waiting for upload to complete...");
-    let result = client
+    let asset = client
         .assets()
         .wait_for_upload_job(&upload_job.id)
         .await?;
 
     println!("🎉 Upload completed successfully!");
-    println!("Asset ID: {}", result.asset.id);
-    println!("Asset Name: {}", result.asset.name);
-    println!("Asset Type: {:?}", result.asset.asset_type);
-    println!("Tags: {:?}", result.asset.tags);
-    println!("Created: {}", result.asset.created_at);
+    println!("Asset ID: {}", asset.id);
+    println!("Asset Name: {}", asset.name);
+    println!("Asset Type: {:?}", asset.asset_type);
+    println!("Tags: {:?}", asset.tags);
+    println!("Created: {}", asset.created_at);
 
-    if let Some(thumbnail) = &result.asset.thumbnail {
+    if let Some(thumbnail) = &asset.thumbnail {
         println!("Thumbnail: {}x{} - {}", thumbnail.width, thumbnail.height, thumbnail.url);
     }
 
-    // List recent assets to verify the upload
-    println!("\n📋 Listing recent assets...");
-    let assets = client
-        .assets()
-        .list(Some(ListAssetsOptions {
-            query: None,
-            continuation: None,
-            ownership: None,
-            sort_by: Some(canva_connect::models::SortByType::CreatedDescending),
-        }))
-        .await?;
-
-    println!("Found {} assets:", assets.items.len());
-    for (i, asset) in assets.items.iter().take(5).enumerate() {
-        println!("  {}. {} ({})", i + 1, asset.name, asset.id);
-    }
+    println!("\n✅ Asset upload completed successfully!");
 
     Ok(())
 }

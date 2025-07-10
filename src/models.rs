@@ -29,8 +29,10 @@ pub struct Asset {
     /// Asset thumbnail URL
     pub thumbnail: Option<Thumbnail>,
     /// Asset creation timestamp
+    #[serde(with = "chrono::serde::ts_seconds")]
     pub created_at: chrono::DateTime<chrono::Utc>,
     /// Asset last updated timestamp
+    #[serde(with = "chrono::serde::ts_seconds")]
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
@@ -312,13 +314,15 @@ pub enum ExportQuality {
 
 /// Job status
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
 pub enum JobStatus {
     /// Job is in progress
+    #[serde(rename = "in_progress")]
     InProgress,
     /// Job completed successfully
+    #[serde(rename = "success")]
     Success,
     /// Job failed
+    #[serde(rename = "failed")]
     Failed,
 }
 
@@ -333,6 +337,33 @@ pub struct Job<T> {
     pub result: Option<T>,
     /// Job error (present when status is Failed)
     pub error: Option<JobError>,
+}
+
+/// Asset upload job response (has different structure)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AssetUploadJob {
+    /// Job ID
+    pub id: String,
+    /// Job status
+    pub status: JobStatus,
+    /// Asset data (present when status is Success)
+    pub asset: Option<Asset>,
+    /// Job error (present when status is Failed)
+    pub error: Option<JobError>,
+}
+
+/// Wrapper for job responses from the API
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JobResponse<T> {
+    /// The job data
+    pub job: Job<T>,
+}
+
+/// Wrapper for asset upload job responses from the API
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AssetUploadJobResponse {
+    /// The asset upload job data
+    pub job: AssetUploadJob,
 }
 
 /// Job error
