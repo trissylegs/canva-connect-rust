@@ -4,6 +4,7 @@
 - `public-api.yml` - OpenAPI 3.0 specification for Canva Connect API
 - `src/` - Rust client library source code
 - `examples/` - Usage examples
+- `scripts/` - Development scripts
 - `Cargo.toml` - Rust project configuration
 
 ## Build/Test Commands
@@ -16,6 +17,24 @@
 - `cargo run --example asset_upload` - Run asset upload example (needs .env setup)
 - `cargo run --example basic_usage -- --token TOKEN` - Run with CLI args instead of .env
 - `cargo run --example asset_upload -- --token TOKEN --file path/to/file` - Run with CLI args
+
+## Development Scripts
+- `./scripts/check.sh` - Run all CI checks locally (formatting, clippy, tests, build)
+- `./scripts/fix.sh` - Auto-fix formatting and clippy issues
+- **Pre-commit hook**: Automatically runs all CI checks before each commit
+
+## Local CI Checks
+Always run before committing to avoid CI failures:
+```bash
+./scripts/check.sh  # Run all checks
+./scripts/fix.sh    # Auto-fix issues
+```
+
+Individual commands:
+- `cargo fmt --all` - Format code
+- `cargo clippy --all-targets --all-features -- -D warnings` - Lint code
+- `cargo test --all-features` - Run all tests
+- `cargo build --release` - Build optimized version
 
 ## Codebase Structure
 - `src/lib.rs` - Main library entry point

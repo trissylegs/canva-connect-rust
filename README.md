@@ -254,6 +254,45 @@ let client = Client::with_rate_limiter(access_token, rate_limiter);
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+### Development
+
+#### Running CI Checks Locally
+
+To avoid CI failures, run checks locally before committing:
+
+```bash
+# Run all CI checks
+./scripts/check.sh
+
+# Auto-fix formatting and clippy issues
+./scripts/fix.sh
+```
+
+#### Pre-commit Hook
+
+A pre-commit hook is automatically installed that runs all CI checks. To set it up manually:
+
+```bash
+cp scripts/check.sh .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
+#### Individual Commands
+
+```bash
+# Format code
+cargo fmt --all
+
+# Run clippy
+cargo clippy --all-targets --all-features -- -D warnings
+
+# Run tests
+cargo test --all-features
+
+# Build release
+cargo build --release
+```
+
 ## License
 
 This project is licensed under the MIT OR Apache-2.0 license.
