@@ -25,21 +25,7 @@ tokio = { version = "1.0", features = ["full"] }
 
 ## Quick Start
 
-```rust,no_run
-use canva_connect::{Client, auth::AccessToken};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Create a client with your access token
-    let client = Client::new(AccessToken::new("your-access-token"))?;
-    
-    // Get user profile information
-    let profile = client.user().get_profile().await?;
-    println!("User: {}", profile.display_name);
-    
-    Ok(())
-}
-```
+See the [crate documentation](https://docs.rs/canva-connect) for comprehensive examples and usage patterns.
 
 ## Authentication
 
@@ -49,52 +35,19 @@ This library supports OAuth 2.0 authentication. You'll need to:
 2. Implement the OAuth flow to get an access token
 3. Use the access token to create a client
 
-```rust,no_run
-use canva_connect::{Client, auth::AccessToken};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Create a client with your access token
-    let client = Client::new(AccessToken::new("your-access-token"))?;
-    
-    // Use the client to make API calls
-    let profile = client.user().get_profile().await?;
-    println!("User: {}", profile.display_name);
-    
-    Ok(())
-}
-```
-
 > **Note**: Complete OAuth flow examples are coming soon. For now, obtain your access token through the [Canva Developer Portal](https://www.canva.dev/docs/connect/authentication/).
 
 ## Examples
 
-For detailed examples with comprehensive documentation, see the [crate documentation](https://docs.rs/canva-connect).
-
-### Basic Usage
-
-```rust,no_run
-use canva_connect::{Client, auth::AccessToken};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::new(AccessToken::new("your-access-token"))?;
-    
-    // Get user profile
-    let profile = client.user().get_profile().await?;
-    println!("User: {}", profile.display_name);
-    
-    Ok(())
-}
-```
-
-The crate documentation includes comprehensive examples for:
+The [crate documentation](https://docs.rs/canva-connect) includes comprehensive, tested examples for:
 - **Asset Management** - Upload files and URLs, get/update metadata, manage tags
-- **Folder Organization** - Create folders, list contents, move items
+- **Folder Organization** - Create folders, list contents, move items  
 - **Design Export** - Export designs to various formats (PNG, PDF, etc.)
 - **Error Handling** - Handle API errors, HTTP errors, and rate limiting
 - **Authentication** - OAuth flows and token management
 - **Rate Limiting** - Configure custom rate limits
+
+All examples in the documentation are automatically tested to ensure they remain up-to-date and functional.
 
 ## Running Examples
 
