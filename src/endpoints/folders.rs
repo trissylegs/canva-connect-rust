@@ -21,9 +21,8 @@ pub struct FoldersApi {
 pub struct CreateFolderRequest {
     /// The folder name
     pub name: String,
-    /// Optional parent folder ID
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_folder_id: Option<String>,
+    /// Parent folder ID (use "root" for top-level folders)
+    pub parent_folder_id: String,
 }
 
 /// Response from creating a folder

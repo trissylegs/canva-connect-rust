@@ -266,10 +266,13 @@ pub struct Folder {
     pub id: String,
     /// Folder name
     pub name: String,
-    /// Folder creation timestamp
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    /// Folder last updated timestamp
-    pub updated_at: chrono::DateTime<chrono::Utc>,
+    /// When the folder was created (Unix timestamp)
+    pub created_at: i64,
+    /// When the folder was last updated (Unix timestamp)
+    pub updated_at: i64,
+    /// Folder thumbnail (if available)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub thumbnail: Option<Thumbnail>,
 }
 
 /// User profile information

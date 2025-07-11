@@ -18,6 +18,7 @@
 - `cargo run --example url_asset_upload` - Run URL asset upload example (needs .env setup)
 - `cargo run --example user_profile` - Run user profile example (needs .env setup)
 - `cargo run --example designs` - Run design API example (needs .env setup)
+- `cargo run --example folders` - Run folder organization example (needs .env setup)
 - `cargo run --example observability --features observability` - Run observability example with tracing
 - `cargo run --example asset_upload -- --file path/to/file` - Run with custom file path
 - `cargo run --example url_asset_upload -- --url "https://rustacean.net/assets/rustacean-flat-happy.png"` - Run with custom URL
@@ -26,6 +27,7 @@
 - `asset_upload` - Upload files as assets
 - `url_asset_upload` - Upload assets from URLs  
 - `designs` - Create and manage designs
+- `folders` - Create and organize content in folders
 - `user_profile` - Get user information and capabilities
 - `observability` - Demonstrate tracing integration (requires `observability` feature)
 
