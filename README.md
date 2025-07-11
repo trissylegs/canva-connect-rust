@@ -444,7 +444,22 @@ cargo build --release
 
 ## Contributing
 
-We welcome contributions! Please see our [GitHub Issues](https://github.com/canvanauts/canva-connect-rust/issues) for areas where help is needed.
+We welcome contributions! Please follow our pull request workflow:
+
+1. **Find an issue** - Check our [GitHub Issues](https://github.com/canvanauts/canva-connect-rust/issues) for areas where help is needed
+2. **Fork and create a branch** - Fork the repo and create a feature branch from `develop`
+3. **Make changes** - Implement your changes with tests and documentation
+4. **Test locally** - Run `./scripts/check.sh` to ensure all CI checks pass
+5. **Create a pull request** - Submit a PR targeting the `develop` branch
+6. **Code review** - Address any feedback from reviewers
+7. **Merge** - Once approved, your PR will be merged to develop
+
+### Branch Strategy
+
+- **main**: Production-ready code (protected, requires PR reviews)
+- **develop**: Integration branch for ongoing development
+- **feature/\***: Feature branches for individual issues
+- **bugfix/\***: Bug fix branches for individual issues
 
 ### Issue Labels
 

@@ -75,7 +75,26 @@ Integration tests make real API calls to Canva Connect and require valid credent
 
 **Note**: The Canva Connect API does not provide an endpoint to delete designs, so integration tests that create designs will leave them in the user's account. Asset tests automatically clean up created assets.
 
-## Development Scripts
+## Development Workflow
+
+### Branch Strategy
+- **main**: Production-ready code, protected branch requiring PR reviews
+- **develop**: Development branch for ongoing work
+- **feature/***: Feature branches for individual issues
+- **bugfix/***: Bug fix branches for individual issues
+
+### Pull Request Workflow
+1. **Create feature branch** from develop: `git checkout -b feature/issue-123-description`
+2. **Make changes** and test locally using scripts below
+3. **Create PR** targeting develop branch
+4. **Get review** and address feedback
+5. **Merge** to develop, then develop gets merged to main
+
+### Remote Configuration
+- **origin**: Your personal fork (trissylegs/canva-connect-rust)
+- **canvanauts**: Main repository (canvanauts/canva-connect-rust)
+
+### Development Scripts
 - `./scripts/setup.sh` - One-time setup script for development environment
 - `./scripts/check.sh` - Run all CI checks locally (formatting, clippy, tests, build)
 - `./scripts/fix.sh` - Auto-fix formatting and clippy issues
@@ -84,14 +103,15 @@ Integration tests make real API calls to Canva Connect and require valid credent
 - `./scripts/pre-commit.sh` - Pre-commit hook logic (version controlled)
 - **Pre-commit hook**: Automatically runs all CI checks before each commit
 
-## Quick Setup
+### Quick Setup
 For new developers:
 ```bash
 ./scripts/setup.sh  # One-time setup
+git checkout develop  # Switch to develop branch
 ```
 
-## Local CI Checks
-Always run before committing to avoid CI failures:
+### Local CI Checks
+Always run before creating PR to avoid CI failures:
 ```bash
 ./scripts/check.sh  # Run all checks
 ./scripts/fix.sh    # Auto-fix issues
