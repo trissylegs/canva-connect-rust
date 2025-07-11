@@ -499,22 +499,29 @@ pub struct ExportUrl {
 /// Export job containing status and results
 pub type ExportJob = Job<ExportResult>;
 
-/// Folder item (design, asset, etc.)
+/// Folder item summary (tagged union for different item types)
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct FolderItem {
-    /// Item ID
-    pub id: String,
-    /// Item type (design, asset, etc.)
-    pub item_type: String,
-    /// Item name
-    pub name: String,
-    /// Item thumbnail (if available)
-    pub thumbnail: Option<Thumbnail>,
-    /// When the item was created (Unix timestamp)
-    pub created_at: i64,
-    /// When the item was last updated (Unix timestamp)
-    pub updated_at: i64,
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum FolderItemSummary {
+    /// Folder item
+    Folder {
+        /// Folder details
+        folder: Folder,
+    },
+    /// Design item
+    Design {
+        /// Design details
+        design: Design,
+    },
+    /// Image item
+    Image {
+        /// Image details
+        image: Asset, // Using Asset for now, could be specific ImageItem
+    },
 }
+
+/// Legacy folder item for compatibility
+pub type FolderItem = FolderItemSummary;
 
 /// Autofill job result
 #[derive(Debug, Clone, Serialize, Deserialize)]

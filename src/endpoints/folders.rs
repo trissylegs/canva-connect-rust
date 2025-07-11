@@ -6,7 +6,7 @@
 use crate::{
     client::Client,
     error::Result,
-    models::{Folder, FolderItem},
+    models::{Folder, FolderItemSummary},
 };
 use serde::{Deserialize, Serialize};
 
@@ -57,7 +57,7 @@ pub struct GetFolderResponse {
 #[derive(Debug, Clone, Deserialize)]
 pub struct ListFolderItemsResponse {
     /// List of folder items
-    pub items: Vec<FolderItem>,
+    pub items: Vec<FolderItemSummary>,
     /// Continuation token for pagination
     #[serde(skip_serializing_if = "Option::is_none")]
     pub continuation: Option<String>,
@@ -119,7 +119,7 @@ impl FoldersApi {
         request: &UpdateFolderRequest,
     ) -> Result<UpdateFolderResponse> {
         let url = format!("/v1/folders/{folder_id}");
-        let response = self.client.put(&url, request).await?;
+        let response = self.client.patch(&url, request).await?;
         Ok(response.json::<UpdateFolderResponse>().await?)
     }
 

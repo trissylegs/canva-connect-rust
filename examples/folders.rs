@@ -25,6 +25,7 @@ use canva_connect::{
     endpoints::folders::{
         CreateFolderRequest, ListFolderItemsRequest, MoveFolderItemRequest, UpdateFolderRequest,
     },
+    models::FolderItemSummary,
     Client,
 };
 use std::env;
@@ -136,13 +137,47 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 items_response.items.len()
             );
             for item in &items_response.items {
-                println!("   • {} ({})", item.name, item.item_type);
-                println!("     ID: {}", item.id);
-                if let Some(thumbnail) = &item.thumbnail {
-                    println!("     Thumbnail: {}x{}", thumbnail.width, thumbnail.height);
+                match item {
+                    FolderItemSummary::Folder { folder } => {
+                        println!("   📁 {} (folder)", folder.name);
+                        println!("     ID: {}", folder.id);
+                        println!("     Created: {}", folder.created_at);
+                        println!("     Updated: {}", folder.updated_at);
+                    }
+                    FolderItemSummary::Design { design } => {
+                        println!(
+                            "   🎨 {} (design)",
+                            design.title.as_deref().unwrap_or("Untitled")
+                        );
+                        println!("     ID: {}", design.id);
+                        if let Some(thumbnail) = &design.thumbnail {
+                            println!("     Thumbnail: {}x{}", thumbnail.width, thumbnail.height);
+                        }
+                        println!(
+                            "     Created: {}",
+                            design.created_at.format("%Y-%m-%d %H:%M:%S UTC")
+                        );
+                        println!(
+                            "     Updated: {}",
+                            design.updated_at.format("%Y-%m-%d %H:%M:%S UTC")
+                        );
+                    }
+                    FolderItemSummary::Image { image } => {
+                        println!("   🖼️  {} (image)", image.name);
+                        println!("     ID: {}", image.id);
+                        if let Some(thumbnail) = &image.thumbnail {
+                            println!("     Thumbnail: {}x{}", thumbnail.width, thumbnail.height);
+                        }
+                        println!(
+                            "     Created: {}",
+                            image.created_at.format("%Y-%m-%d %H:%M:%S UTC")
+                        );
+                        println!(
+                            "     Updated: {}",
+                            image.updated_at.format("%Y-%m-%d %H:%M:%S UTC")
+                        );
+                    }
                 }
-                println!("     Created: {}", item.created_at);
-                println!("     Updated: {}", item.updated_at);
                 println!();
             }
         }
@@ -191,16 +226,30 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     {
         Ok(root_items) => {
             if let Some(first_item) = root_items.items.first() {
-                println!("📦 Found item to move: {}", first_item.name);
+                let (item_name, item_id) = match first_item {
+                    FolderItemSummary::Folder { folder } => {
+                        (folder.name.clone(), folder.id.clone())
+                    }
+                    FolderItemSummary::Design { design } => (
+                        design
+                            .title
+                            .clone()
+                            .unwrap_or_else(|| "Untitled".to_string()),
+                        design.id.clone(),
+                    ),
+                    FolderItemSummary::Image { image } => (image.name.clone(), image.id.clone()),
+                };
+
+                println!("📦 Found item to move: {item_name}");
 
                 let move_request = MoveFolderItemRequest {
-                    item_id: first_item.id.clone(),
+                    item_id,
                     destination_folder_id: main_folder.id.clone(),
                 };
 
                 match folders_api.move_folder_item(&move_request).await {
                     Ok(()) => {
-                        println!("✅ Successfully moved '{}' to main folder", first_item.name);
+                        println!("✅ Successfully moved '{item_name}' to main folder");
                         println!();
                     }
                     Err(e) => {
