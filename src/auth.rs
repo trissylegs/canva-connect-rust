@@ -761,7 +761,7 @@ mod tests {
         let config = OAuthConfig::new(
             "test-client-id",
             "test-client-secret",
-            "http://localhost:8080/callback",
+            "http://127.0.0.1:8080/callback",
             vec![Scope::DesignMetaRead, Scope::AssetRead],
         );
 
@@ -771,7 +771,7 @@ mod tests {
             .expect("Failed to generate authorization URL");
 
         assert!(url.contains("client_id=test-client-id"));
-        assert!(url.contains("redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fcallback"));
+        assert!(url.contains("redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Fcallback"));
         assert!(url.contains("response_type=code"));
         assert!(url.contains("scope=design%3Ameta%3Aread+asset%3Aread"));
         assert!(url.contains("state=test-state"));
@@ -788,7 +788,7 @@ mod tests {
             client_secret: "test-secret".to_string(),
             code: "test-code".to_string(),
             grant_type: "authorization_code".to_string(),
-            redirect_uri: "http://localhost:8080/callback".to_string(),
+            redirect_uri: "http://127.0.0.1:8080/callback".to_string(),
             code_verifier: Some(pkce.code_verifier.clone()),
         };
 
@@ -804,7 +804,7 @@ mod tests {
             client_secret: "test-secret".to_string(),
             code: "test-code".to_string(),
             grant_type: "authorization_code".to_string(),
-            redirect_uri: "http://localhost:8080/callback".to_string(),
+            redirect_uri: "http://127.0.0.1:8080/callback".to_string(),
             code_verifier: None,
         };
 
@@ -818,7 +818,7 @@ mod tests {
         let config = OAuthConfig::new(
             "test-client-id",
             "test-client-secret",
-            "http://localhost:8080/callback",
+            "http://127.0.0.1:8080/callback",
             vec![Scope::DesignMetaRead],
         );
 

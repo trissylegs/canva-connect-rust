@@ -21,7 +21,7 @@ async fn main() -> Result<()> {
     let client_secret =
         env::var("CANVA_CLIENT_SECRET").unwrap_or_else(|_| "your_client_secret".to_string());
     let redirect_uri = env::var("CANVA_REDIRECT_URI")
-        .unwrap_or_else(|_| "http://localhost:8080/callback".to_string());
+        .unwrap_or_else(|_| "http://127.0.0.1:8080/callback".to_string());
 
     // Create OAuth configuration
     let config = OAuthConfig::new(
@@ -125,7 +125,7 @@ async fn main() -> Result<()> {
     let expired_client = OAuthClient::new(OAuthConfig::new(
         "test_client_id",
         "test_client_secret",
-        "http://localhost:8080/callback",
+        "http://127.0.0.1:8080/callback",
         vec![Scope::AssetRead],
     ));
 

@@ -147,7 +147,7 @@ async fn test_oauth_client_creation() {
     let config = OAuthConfig::new(
         "client_id",
         "client_secret",
-        "http://localhost:8080/callback",
+        "http://127.0.0.1:8080/callback",
         vec![Scope::AssetRead, Scope::AssetWrite],
     );
 
@@ -163,7 +163,7 @@ async fn test_oauth_client_with_custom_token_store() {
     let config = OAuthConfig::new(
         "client_id",
         "client_secret",
-        "http://localhost:8080/callback",
+        "http://127.0.0.1:8080/callback",
         vec![Scope::AssetRead],
     );
 
@@ -270,7 +270,7 @@ mod oauth_client_tests {
         OAuthConfig::new(
             "test_client_id",
             "test_client_secret",
-            "http://localhost:8080/callback",
+            "http://127.0.0.1:8080/callback",
             vec![Scope::AssetRead, Scope::AssetWrite],
         )
     }
@@ -283,7 +283,7 @@ mod oauth_client_tests {
         let (url, _pkce) = client.authorization_url(Some("test_state")).unwrap();
 
         assert!(url.contains("client_id=test_client_id"));
-        assert!(url.contains("redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fcallback"));
+        assert!(url.contains("redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Fcallback"));
         assert!(url.contains("response_type=code"));
         assert!(url.contains("scope=asset%3Aread+asset%3Awrite"));
         assert!(url.contains("state=test_state"));

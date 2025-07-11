@@ -10,7 +10,7 @@ async fn test_token_management_integration() {
     let config = OAuthConfig::new(
         "invalid_client_id",
         "invalid_client_secret",
-        "http://localhost:8080/callback",
+        "http://127.0.0.1:8080/callback",
         vec![Scope::AssetRead],
     );
 
@@ -33,7 +33,7 @@ async fn test_token_exchange_error_handling() {
     let config = OAuthConfig::new(
         "invalid_client_id",
         "invalid_client_secret",
-        "http://localhost:8080/callback",
+        "http://127.0.0.1:8080/callback",
         vec![Scope::AssetRead],
     );
 
@@ -50,7 +50,7 @@ async fn test_refresh_token_error_handling() {
     let config = OAuthConfig::new(
         "invalid_client_id",
         "invalid_client_secret",
-        "http://localhost:8080/callback",
+        "http://127.0.0.1:8080/callback",
         vec![Scope::AssetRead],
     );
 
@@ -79,7 +79,7 @@ async fn test_token_introspection_error_handling() {
     let config = OAuthConfig::new(
         "invalid_client_id",
         "invalid_client_secret",
-        "http://localhost:8080/callback",
+        "http://127.0.0.1:8080/callback",
         vec![Scope::AssetRead],
     );
 
@@ -95,7 +95,7 @@ async fn test_token_revocation_error_handling() {
     let config = OAuthConfig::new(
         "invalid_client_id",
         "invalid_client_secret",
-        "http://localhost:8080/callback",
+        "http://127.0.0.1:8080/callback",
         vec![Scope::AssetRead],
     );
 
@@ -113,7 +113,7 @@ async fn test_token_auto_refresh_scenario() {
     let config = OAuthConfig::new(
         "test_client_id",
         "test_client_secret",
-        "http://localhost:8080/callback",
+        "http://127.0.0.1:8080/callback",
         vec![Scope::AssetRead],
     );
 
@@ -142,7 +142,7 @@ async fn test_concurrent_token_operations() {
     let config = OAuthConfig::new(
         "test_client_id",
         "test_client_secret",
-        "http://localhost:8080/callback",
+        "http://127.0.0.1:8080/callback",
         vec![Scope::AssetRead],
     );
 
@@ -186,7 +186,7 @@ async fn create_client_with_token(
     let config = OAuthConfig::new(
         "test_client_id",
         "test_client_secret",
-        "http://localhost:8080/callback",
+        "http://127.0.0.1:8080/callback",
         vec![Scope::AssetRead],
     );
 
@@ -209,7 +209,7 @@ async fn test_token_lifecycle_management() {
     let config = OAuthConfig::new(
         "test_client_id",
         "test_client_secret",
-        "http://localhost:8080/callback",
+        "http://127.0.0.1:8080/callback",
         vec![Scope::AssetRead],
     );
 
@@ -249,7 +249,7 @@ async fn test_token_store_sharing() {
     let config = OAuthConfig::new(
         "test_client_id",
         "test_client_secret",
-        "http://localhost:8080/callback",
+        "http://127.0.0.1:8080/callback",
         vec![Scope::AssetRead],
     );
 
