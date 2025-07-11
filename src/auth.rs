@@ -235,4 +235,9 @@ impl OAuthClient {
             Err(Error::Auth(format!("Token exchange failed: {error_text}")))
         }
     }
+
+    /// Get the OAuth configuration
+    pub fn config(&self) -> &OAuthConfig {
+        &self.config
+    }
 }
