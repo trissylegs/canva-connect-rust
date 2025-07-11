@@ -19,6 +19,7 @@
 - `cargo run --example user_profile` - Run user profile example (needs .env setup)
 - `cargo run --example designs` - Run design API example (needs .env setup)
 - `cargo run --example folders` - Run folder organization example (needs .env setup)
+- `cargo run --example oauth2_flow` - Run OAuth 2.0 authorization code flow example (needs .env setup)
 - `cargo run --example observability --features observability` - Run observability example with tracing
 - `cargo run --example asset_upload -- --file path/to/file` - Run with custom file path
 - `cargo run --example url_asset_upload -- --url "https://rustacean.net/assets/rustacean-flat-happy.png"` - Run with custom URL
@@ -33,6 +34,7 @@
 - `exports` - Export designs to various formats (3 endpoints: create_design_export_job, get_design_export_job, get_design_export_formats)
 - `folders` - Create and organize content in folders (5 endpoints: create_folder, get_folder, update_folder, list_folder_items, move_folder_item)
 - `user_profile` - Get user information and capabilities (3 endpoints: get_me, get_profile, get_capabilities)
+- `oauth2_flow` - Complete OAuth 2.0 authorization code flow with local callback server
 - `observability` - Demonstrate tracing integration (requires `observability` feature)
 
 **Debug Logging:**

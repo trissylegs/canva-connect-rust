@@ -86,3 +86,7 @@ path = "examples/comments.rs"
 [[example]]
 name = "exports"
 path = "examples/exports.rs"
+
+[[example]]
+name = "oauth2_flow"
+path = "examples/oauth2_flow.rs"
