@@ -468,7 +468,7 @@ mod tests {
         let string_cell = DataTableCell::String {
             value: Some("test".to_string()),
         };
-        let number_cell = DataTableCell::Number { value: Some(3.14) };
+        let number_cell = DataTableCell::Number { value: Some(42.7) };
         let boolean_cell = DataTableCell::Boolean { value: Some(true) };
         let date_cell = DataTableCell::Date {
             value: Some(1640995200), // 2022-01-01 00:00:00 UTC
@@ -485,7 +485,7 @@ mod tests {
         // Test number cell
         match number_cell {
             DataTableCell::Number { value } => {
-                assert_eq!(value, Some(3.14));
+                assert_eq!(value, Some(42.7));
             }
             _ => panic!("Expected number cell"),
         }
