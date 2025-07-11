@@ -69,7 +69,7 @@ pub struct MoveFolderItemRequest {
     /// The item ID to move
     pub item_id: String,
     /// The destination folder ID
-    pub destination_folder_id: String,
+    pub to_folder_id: String,
 }
 
 /// Parameters for listing folder items

@@ -225,8 +225,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await
     {
         Ok(root_items) => {
-            if let Some(first_item) = root_items.items.first() {
-                let (item_name, item_id) = match first_item {
+            // Find an item that's not the folder we just created
+            let suitable_item = root_items.items.iter().find(|item| {
+                match item {
+                    FolderItemSummary::Folder { folder } => folder.id != main_folder.id,
+                    _ => true, // Designs and images are always suitable to move
+                }
+            });
+
+            if let Some(item) = suitable_item {
+                let (item_name, item_id) = match item {
                     FolderItemSummary::Folder { folder } => {
                         (folder.name.clone(), folder.id.clone())
                     }
@@ -240,11 +248,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     FolderItemSummary::Image { image } => (image.name.clone(), image.id.clone()),
                 };
 
-                println!("📦 Found item to move: {item_name}");
+                println!("📦 Found item to move: {item_name} (ID: {item_id})");
 
                 let move_request = MoveFolderItemRequest {
                     item_id,
-                    destination_folder_id: main_folder.id.clone(),
+                    to_folder_id: main_folder.id.clone(),
                 };
 
                 match folders_api.move_folder_item(&move_request).await {
@@ -258,7 +266,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             } else {
-                println!("ℹ️  No items found in root folder to move");
+                println!("📭 No suitable items found in root folder to move (skipping self-move)");
                 println!(
                     "   Create some designs or upload assets first to test moving functionality"
                 );

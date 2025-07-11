@@ -48,7 +48,7 @@ pub struct Thumbnail {
     pub height: u32,
 }
 
-/// Design metadata
+/// Design metadata (full details)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Design {
     /// Design ID
@@ -57,6 +57,27 @@ pub struct Design {
     pub title: Option<String>,
     /// Design owner
     pub owner: TeamUserSummary,
+    /// Design thumbnail
+    pub thumbnail: Option<Thumbnail>,
+    /// Design URLs
+    pub urls: DesignLinks,
+    /// Design creation timestamp (Unix timestamp in seconds)
+    #[serde(with = "chrono::serde::ts_seconds")]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    /// Design last updated timestamp (Unix timestamp in seconds)
+    #[serde(with = "chrono::serde::ts_seconds")]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    /// Total number of pages in the design
+    pub page_count: Option<u32>,
+}
+
+/// Design summary (basic details without owner)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DesignSummary {
+    /// Design ID
+    pub id: String,
+    /// Design title
+    pub title: Option<String>,
     /// Design thumbnail
     pub thumbnail: Option<Thumbnail>,
     /// Design URLs
@@ -511,7 +532,7 @@ pub enum FolderItemSummary {
     /// Design item
     Design {
         /// Design details
-        design: Design,
+        design: DesignSummary,
     },
     /// Image item
     Image {
