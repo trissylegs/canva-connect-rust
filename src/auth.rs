@@ -126,9 +126,14 @@ pub struct PkceParams {
 }
 
 impl PkceParams {
-    /// Generate new PKCE parameters
+    /// Generate new PKCE parameters with default length (43 characters, 256 bits of entropy)
     pub fn new() -> Self {
-        let code_verifier = Self::generate_code_verifier();
+        Self::with_length(43)
+    }
+
+    /// Generate PKCE parameters with custom verifier length (43-128 characters)
+    pub fn with_length(length: usize) -> Self {
+        let code_verifier = Self::generate_code_verifier(length);
         let code_challenge = Self::generate_code_challenge(&code_verifier);
 
         Self {
@@ -137,26 +142,22 @@ impl PkceParams {
         }
     }
 
-    /// Generate a cryptographically secure code verifier (43-128 characters)
-    fn generate_code_verifier() -> String {
+    /// Generate a cryptographically secure code verifier with specified length
+    fn generate_code_verifier(target_length: usize) -> String {
+        let length = target_length.clamp(43, 128);
         let mut rng = thread_rng();
-        let length = rng.gen_range(43..=128);
 
-        // Generate random bytes and encode as base64url
-        let mut bytes = vec![0u8; length * 3 / 4]; // Enough bytes for desired length
+        // Generate enough random bytes to ensure we get the target length
+        // Base64url encoding: 4 chars per 3 bytes, so we need (length * 3) / 4 bytes (rounded up)
+        let byte_count = (length * 3).div_ceil(4);
+        let mut bytes = vec![0u8; byte_count];
         rng.fill(&mut bytes[..]);
 
-        let verifier = URL_SAFE_NO_PAD.encode(&bytes);
+        let mut verifier = URL_SAFE_NO_PAD.encode(&bytes);
 
-        // Ensure we have the right length
-        if verifier.len() >= 43 && verifier.len() <= 128 {
-            verifier
-        } else {
-            // Fallback: generate exactly 43 characters
-            let mut bytes = vec![0u8; 32]; // 32 bytes -> 43 chars in base64url
-            rng.fill(&mut bytes[..]);
-            URL_SAFE_NO_PAD.encode(&bytes)
-        }
+        // Truncate to exact length if needed
+        verifier.truncate(length);
+        verifier
     }
 
     /// Generate code challenge from verifier (SHA256 hash, base64url encoded)
@@ -296,29 +297,35 @@ impl OAuthClient {
         self.config.authorization_url_with_pkce(state, pkce)
     }
 
-    /// Exchange authorization code for access token
-    pub async fn exchange_code(&self, code: &str) -> Result<TokenExchangeResponse> {
-        self.exchange_code_with_pkce(code, None).await
+    /// Exchange authorization code for access token (PKCE required for Canva Connect API)
+    ///
+    /// Note: This method is deprecated. Use `exchange_code_with_pkce` instead as PKCE is required.
+    #[deprecated(
+        note = "PKCE is required for Canva Connect API. Use exchange_code_with_pkce instead."
+    )]
+    pub async fn exchange_code(&self, _code: &str) -> Result<TokenExchangeResponse> {
+        Err(Error::Auth(
+            "PKCE is required for Canva Connect API. Use exchange_code_with_pkce instead."
+                .to_string(),
+        ))
     }
 
     /// Exchange authorization code for access token with PKCE
+    ///
+    /// PKCE is required for the Canva Connect API.
     pub async fn exchange_code_with_pkce(
         &self,
         code: &str,
-        pkce: Option<&PkceParams>,
+        pkce: &PkceParams,
     ) -> Result<TokenExchangeResponse> {
-        let mut form_data = vec![
+        let form_data = vec![
             ("client_id", self.config.client_id.as_str()),
             ("client_secret", self.config.client_secret.as_str()),
             ("code", code),
             ("grant_type", "authorization_code"),
             ("redirect_uri", self.config.redirect_uri.as_str()),
+            ("code_verifier", &pkce.code_verifier),
         ];
-
-        // Add code_verifier if PKCE is used
-        if let Some(pkce) = pkce {
-            form_data.push(("code_verifier", &pkce.code_verifier));
-        }
 
         let response = self
             .http_client
