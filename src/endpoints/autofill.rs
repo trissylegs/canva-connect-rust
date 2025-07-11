@@ -208,7 +208,7 @@ impl AutofillApi {
     /// match job.status {
     ///     DesignAutofillStatus::Success => println!("Autofill completed!"),
     ///     DesignAutofillStatus::Failed => println!("Autofill failed"),
-    ///     _ => unreachable!("Job should be completed"),
+    ///     DesignAutofillStatus::InProgress => println!("Job still in progress"),
     /// }
     /// # Ok(())
     /// # }
