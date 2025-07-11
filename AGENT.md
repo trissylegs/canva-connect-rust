@@ -79,16 +79,15 @@ Integration tests make real API calls to Canva Connect and require valid credent
 
 ### Branch Strategy
 - **main**: Production-ready code, protected branch requiring PR reviews
-- **develop**: Development branch for ongoing work
 - **feature/***: Feature branches for individual issues
 - **bugfix/***: Bug fix branches for individual issues
 
 ### Pull Request Workflow
-1. **Create feature branch** from develop: `git checkout -b feature/issue-123-description`
+1. **Create feature branch** from main: `git checkout -b feature/issue-123-description`
 2. **Make changes** and test locally using scripts below
-3. **Create PR** targeting develop branch
+3. **Create PR** targeting main branch
 4. **Get review** and address feedback
-5. **Merge** to develop, then develop gets merged to main
+5. **Merge** to main
 
 ### Remote Configuration
 - **origin**: Your personal fork (trissylegs/canva-connect-rust)
@@ -107,7 +106,7 @@ Integration tests make real API calls to Canva Connect and require valid credent
 For new developers:
 ```bash
 ./scripts/setup.sh  # One-time setup
-git checkout develop  # Switch to develop branch
+git checkout main    # Start from main branch
 ```
 
 ### Local CI Checks

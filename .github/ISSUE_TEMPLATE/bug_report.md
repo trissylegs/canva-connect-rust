@@ -36,11 +36,11 @@ Paste error output here
 ## Tasks
 - [ ] Reproduce the issue
 - [ ] Identify root cause
-- [ ] Create bugfix branch from develop: `git checkout -b bugfix/issue-{number}-{description}`
+- [ ] Create bugfix branch from main: `git checkout -b bugfix/issue-{number}-{description}`
 - [ ] Implement fix
 - [ ] Add regression tests
 - [ ] Update documentation if needed
-- [ ] Create pull request targeting develop branch
+- [ ] Create pull request targeting main branch
 
 ## Files to modify
 - List relevant files that may need changes
