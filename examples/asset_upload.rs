@@ -58,7 +58,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     // Create the client
-    let client = Client::new(AccessToken::new(access_token));
+    let client =
+        Client::new(AccessToken::new(access_token)).expect("Failed to create Canva client");
     println!("✓ Created Canva Connect API client");
 
     // Read the file

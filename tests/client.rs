@@ -3,7 +3,7 @@ use canva_connect::{auth::AccessToken, endpoints::assets::AssetUploadMetadata, C
 #[test]
 fn test_client_creation() {
     let access_token = AccessToken::new("test_token".to_string());
-    let client = Client::new(access_token);
+    let client = Client::new(access_token).expect("Failed to create client");
 
     // Verify client was created successfully by checking we can get assets API
     let _assets_api = client.assets();
@@ -14,8 +14,8 @@ fn test_client_with_different_tokens() {
     let token1 = AccessToken::new("token1".to_string());
     let token2 = AccessToken::new("token2".to_string());
 
-    let client1 = Client::new(token1);
-    let client2 = Client::new(token2);
+    let client1 = Client::new(token1).expect("Failed to create client1");
+    let client2 = Client::new(token2).expect("Failed to create client2");
 
     // Both should be created successfully
     let _assets1 = client1.assets();
@@ -28,14 +28,14 @@ fn test_access_token_creation() {
     let access_token = AccessToken::new(token_string.clone());
 
     // Create client with this token
-    let client = Client::new(access_token);
+    let client = Client::new(access_token).expect("Failed to create client");
     let _assets = client.assets();
 }
 
 #[test]
 fn test_client_endpoints_available() {
     let access_token = AccessToken::new("test_token".to_string());
-    let client = Client::new(access_token);
+    let client = Client::new(access_token).expect("Failed to create client");
 
     // Test that all expected endpoints are available
     let _assets = client.assets();
@@ -59,7 +59,7 @@ fn test_error_type_properties() {
 #[test]
 fn test_access_token_with_empty_string() {
     let access_token = AccessToken::new("".to_string());
-    let client = Client::new(access_token);
+    let client = Client::new(access_token).expect("Failed to create client");
 
     // Should still create client (validation happens at API call time)
     let _assets = client.assets();

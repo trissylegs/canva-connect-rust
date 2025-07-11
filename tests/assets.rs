@@ -64,7 +64,7 @@ fn test_asset_upload_metadata_with_special_characters() {
 #[test]
 fn test_assets_api_creation() {
     let access_token = AccessToken::new("test_token".to_string());
-    let client = Client::new(access_token);
+    let client = Client::new(access_token).expect("Failed to create client");
 
     let _assets_api = client.assets();
 }

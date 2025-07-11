@@ -52,7 +52,7 @@ impl TestConfig {
         // Get access token
         let token_str = env::var("CANVA_ACCESS_TOKEN").ok()?;
         let access_token = AccessToken::new(token_str);
-        let client = Client::new(access_token.clone());
+        let client = Client::new(access_token.clone()).expect("Failed to create client");
 
         Some(TestConfig {
             access_token,

@@ -72,7 +72,8 @@ impl AutofillApi {
     ///
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = Client::new(AccessToken::new("token"));
+    /// let client = Client::new(AccessToken::new("token"))
+    ///     .expect("Failed to create client");
     /// let autofill = client.autofill();
     ///
     /// let mut data = HashMap::new();
@@ -137,7 +138,8 @@ impl AutofillApi {
     ///
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = Client::new(AccessToken::new("token"));
+    /// let client = Client::new(AccessToken::new("token"))
+    ///     .expect("Failed to create client");
     /// let autofill = client.autofill();
     ///
     /// let job = autofill.get_autofill_job("job_123").await?;
@@ -196,7 +198,8 @@ impl AutofillApi {
     ///
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = Client::new(AccessToken::new("token"));
+    /// let client = Client::new(AccessToken::new("token"))
+    ///     .expect("Failed to create client");
     /// let autofill = client.autofill();
     ///
     /// // Wait for job to complete with custom poll interval

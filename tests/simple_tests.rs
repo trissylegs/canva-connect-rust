@@ -58,7 +58,7 @@ fn test_asset_upload_metadata_serialization() {
 #[test]
 fn test_client_creation() {
     let access_token = AccessToken::new("test_token".to_string());
-    let client = Client::new(access_token);
+    let client = Client::new(access_token).expect("Failed to create client");
 
     // Verify client was created successfully by checking we can get assets API
     let _assets_api = client.assets();

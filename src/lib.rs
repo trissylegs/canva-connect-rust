@@ -1,3 +1,5 @@
+#![deny(clippy::unwrap_used, clippy::expect_used)]
+
 //! # Canva Connect API Client
 //!
 //! A Rust client library for the Canva Connect API that provides a safe and ergonomic interface
@@ -29,7 +31,8 @@
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     let client = Client::new(AccessToken::new("your-access-token"));
+//!     let client = Client::new(AccessToken::new("your-access-token"))
+//!         .expect("Failed to create client");
 //!     
 //!     // Create an asset upload job
 //!     let metadata = canva_connect::endpoints::assets::AssetUploadMetadata::new(
@@ -107,7 +110,8 @@
 //!
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let client = Client::new(AccessToken::new("token"));
+//! let client = Client::new(AccessToken::new("token"))
+//!     .expect("Failed to create client");
 //!
 //! // Upload an asset
 //! let metadata = AssetUploadMetadata::new("logo.png", vec!["branding".to_string()]);
@@ -127,7 +131,8 @@
 //!
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let client = Client::new(AccessToken::new("token"));
+//! let client = Client::new(AccessToken::new("token"))
+//!     .expect("Failed to create client");
 //!
 //! // Upload from URL
 //! let request = CreateUrlAssetUploadJobRequest {
@@ -147,7 +152,8 @@
 //!
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let client = Client::new(AccessToken::new("token"));
+//! let client = Client::new(AccessToken::new("token"))
+//!     .expect("Failed to create client");
 //!
 //! // Create a presentation design
 //! let request = CreateDesignRequest {
@@ -170,7 +176,8 @@
 //!
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let client = Client::new(AccessToken::new("token"));
+//! let client = Client::new(AccessToken::new("token"))
+//!     .expect("Failed to create client");
 //!
 //! // Get user profile
 //! let profile = client.user().get_profile().await?;

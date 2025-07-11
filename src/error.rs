@@ -45,6 +45,14 @@ pub enum Error {
     /// Generic error with message
     #[error("{0}")]
     Generic(String),
+
+    /// Invalid header value
+    #[error("Invalid header value: {0}")]
+    InvalidHeader(#[from] reqwest::header::InvalidHeaderValue),
+
+    /// HTTP client build error
+    #[error("Failed to build HTTP client: {0}")]
+    ClientBuild(reqwest::Error),
 }
 
 /// API error codes returned by the Canva Connect API

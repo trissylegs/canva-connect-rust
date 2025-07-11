@@ -16,7 +16,8 @@
 //!
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let client = Client::new(AccessToken::new("your-access-token"));
+//! let client = Client::new(AccessToken::new("your-access-token"))
+//!     .expect("Failed to create client");
 //! let designs_api = client.designs();
 //!
 //! // List designs
@@ -81,7 +82,8 @@ impl DesignsApi {
     ///
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = Client::new(AccessToken::new("token"));
+    /// let client = Client::new(AccessToken::new("token"))
+    ///     .expect("Failed to create client");
     /// let designs = client.designs();
     ///
     /// // List all designs
@@ -156,7 +158,8 @@ impl DesignsApi {
     ///
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = Client::new(AccessToken::new("token"));
+    /// let client = Client::new(AccessToken::new("token"))
+    ///     .expect("Failed to create client");
     /// let designs = client.designs();
     ///
     /// let design = designs.get("DAFVztcvd9z").await?;
@@ -192,7 +195,8 @@ impl DesignsApi {
     ///
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = Client::new(AccessToken::new("token"));
+    /// let client = Client::new(AccessToken::new("token"))
+    ///     .expect("Failed to create client");
     /// let designs = client.designs();
     ///
     /// // Create a presentation

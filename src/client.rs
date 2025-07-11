@@ -10,7 +10,8 @@
 //!
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let client = Client::new(AccessToken::new("your-token"));
+//! let client = Client::new(AccessToken::new("your-token"))
+//!     .expect("Failed to create client");
 //! let assets_api = client.assets();
 //! # Ok(())
 //! # }
@@ -37,11 +38,11 @@ pub struct Client {
 
 impl Client {
     /// Create a new client with the given access token
-    pub fn new(access_token: AccessToken) -> Self {
+    pub fn new(access_token: AccessToken) -> crate::Result<Self> {
         let mut headers = HeaderMap::new();
         headers.insert(
             AUTHORIZATION,
-            HeaderValue::from_str(&access_token.authorization_header()).unwrap(),
+            HeaderValue::from_str(&access_token.authorization_header())?,
         );
         headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
         headers.insert(
@@ -52,28 +53,34 @@ impl Client {
         let http_client = reqwest::Client::builder()
             .default_headers(headers)
             .build()
-            .unwrap();
+            .map_err(crate::Error::ClientBuild)?;
 
-        Self {
+        Ok(Self {
             http_client,
             base_url: BASE_URL.to_string(),
             access_token,
             rate_limiter: Arc::new(ApiRateLimiter::default()),
-        }
+        })
     }
 
     /// Create a new client with a custom base URL and access token
-    pub fn with_base_url(base_url: impl Into<String>, access_token: AccessToken) -> Self {
-        let mut client = Self::new(access_token);
+    pub fn with_base_url(
+        base_url: impl Into<String>,
+        access_token: AccessToken,
+    ) -> crate::Result<Self> {
+        let mut client = Self::new(access_token)?;
         client.base_url = base_url.into();
-        client
+        Ok(client)
     }
 
     /// Create a new client with a custom rate limiter
-    pub fn with_rate_limiter(access_token: AccessToken, rate_limiter: ApiRateLimiter) -> Self {
-        let mut client = Self::new(access_token);
+    pub fn with_rate_limiter(
+        access_token: AccessToken,
+        rate_limiter: ApiRateLimiter,
+    ) -> crate::Result<Self> {
+        let mut client = Self::new(access_token)?;
         client.rate_limiter = Arc::new(rate_limiter);
-        client
+        Ok(client)
     }
 
     /// Get the assets API
@@ -326,7 +333,8 @@ mod tests {
     #[test]
     fn test_client_creation() {
         let token = AccessToken::new("test-token");
-        let client = Client::new(token);
+        #[allow(clippy::expect_used)]
+        let client = Client::new(token).expect("Failed to create client");
         assert_eq!(client.base_url(), BASE_URL);
         assert_eq!(client.access_token().as_str(), "test-token");
     }
@@ -335,7 +343,8 @@ mod tests {
     fn test_client_with_custom_base_url() {
         let token = AccessToken::new("test-token");
         let base_url = "https://test.api.canva.com";
-        let client = Client::with_base_url(base_url, token);
+        #[allow(clippy::expect_used)]
+        let client = Client::with_base_url(base_url, token).expect("Failed to create client");
         assert_eq!(client.base_url(), base_url);
     }
 }
