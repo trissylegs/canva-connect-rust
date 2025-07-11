@@ -126,4 +126,6 @@ jobs:
       - name: Build docs
         run: cargo doc --no-deps --all-features --document-private-items
       - name: Check for broken intra-doc links
-        run: cargo doc --no-deps --all-features -- -D warnings
+        run: cargo doc --no-deps --all-features
+        env:
+          RUSTDOCFLAGS: "-D warnings"
