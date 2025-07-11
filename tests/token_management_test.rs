@@ -280,13 +280,15 @@ mod oauth_client_tests {
         let config = create_test_config();
         let client = OAuthClient::new(config);
 
-        let url = client.authorization_url(Some("test_state")).unwrap();
+        let (url, _pkce) = client.authorization_url(Some("test_state")).unwrap();
 
         assert!(url.contains("client_id=test_client_id"));
         assert!(url.contains("redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fcallback"));
         assert!(url.contains("response_type=code"));
         assert!(url.contains("scope=asset%3Aread+asset%3Awrite"));
         assert!(url.contains("state=test_state"));
+        assert!(url.contains("code_challenge"));
+        assert!(url.contains("code_challenge_method=S256"));
     }
 
     #[tokio::test]

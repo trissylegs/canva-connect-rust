@@ -39,7 +39,8 @@ async fn test_token_exchange_error_handling() {
 
     let client = OAuthClient::new(config);
 
-    // Test token exchange with invalid code
+    // Test token exchange with invalid code (testing deprecated method)
+    #[allow(deprecated)]
     let result = client.exchange_code("invalid_code").await;
     assert!(matches!(result, Err(Error::Auth(_))));
 }

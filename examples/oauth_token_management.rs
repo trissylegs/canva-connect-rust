@@ -42,8 +42,8 @@ async fn main() -> Result<()> {
     println!("\n1. Creating OAuth client with automatic token management...");
     let client = OAuthClient::new(config.clone());
 
-    // Generate authorization URL
-    let auth_url = client.authorization_url(Some("demo_state"))?;
+    // Generate authorization URL (returns URL and PKCE parameters)
+    let (auth_url, _pkce_params) = client.authorization_url(Some("demo_state"))?;
     println!("Authorization URL: {auth_url}");
 
     // Example 2: Token Store Operations
