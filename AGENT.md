@@ -122,6 +122,19 @@ Individual commands:
 - `cargo test --all-features` - Run all tests
 - `cargo build --release` - Build optimized version
 
+### Required CI Status Checks
+The main branch is protected with required status checks. All PRs must pass these CI jobs before merge:
+
+- **Formatting** - Code formatting validation (`cargo fmt --check`)
+- **Clippy** - Linting and code quality (`cargo clippy`)
+- **Test Suite (stable)** - Unit and doc tests on stable Rust
+- **Test Suite (beta)** - Unit and doc tests on beta Rust  
+- **Build (stable)** - Library and examples build on stable Rust
+- **Build (beta)** - Library and examples build on beta Rust
+- **Documentation** - Documentation build with link checking
+
+PRs cannot be merged until all status checks pass green. Use the local CI commands above to ensure your changes will pass before pushing.
+
 ## Codebase Structure
 - `src/lib.rs` - Main library entry point
 - `src/client.rs` - HTTP client implementation with rate limiting
