@@ -25,13 +25,13 @@ tokio = { version = "1.0", features = ["full"] }
 
 ## Quick Start
 
-```rust,skt-connect,no_run
+```rust,no_run
 use canva_connect::{Client, auth::AccessToken};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create a client with your access token
-    let client = Client::new(AccessToken::new("your-access-token"));
+    let client = Client::new(AccessToken::new("your-access-token"))?;
     
     // Get user profile information
     let profile = client.user().get_profile().await?;
@@ -49,13 +49,13 @@ This library supports OAuth 2.0 authentication. You'll need to:
 2. Implement the OAuth flow to get an access token
 3. Use the access token to create a client
 
-```rust,skt-connect,no_run
+```rust,no_run
 use canva_connect::{Client, auth::AccessToken};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create a client with your access token
-    let client = Client::new(AccessToken::new("your-access-token"));
+    let client = Client::new(AccessToken::new("your-access-token"))?;
     
     // Use the client to make API calls
     let profile = client.user().get_profile().await?;
@@ -78,7 +78,7 @@ use canva_connect::{Client, auth::AccessToken};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::new(AccessToken::new("your-access-token"));
+    let client = Client::new(AccessToken::new("your-access-token"))?;
     
     // Get user profile
     let profile = client.user().get_profile().await?;
