@@ -2,11 +2,11 @@
 name = "canva-connect"
 version = "0.1.0"
 edition = "2021"
-authors = ["Your Name <your.email@example.com>"]
-description = "A Rust client library for the Canva Connect API"
+authors = ["Triss Healy <triss.healy@canva.com>", "Amp AI Assistant <amp@sourcegraph.com>"]
+description = "A Rust client library for the Canva Connect API. Most code is AI-generated with Amp by Sourcegraph."
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/yourusername/canva-connect-rust"
-homepage = "https://github.com/yourusername/canva-connect-rust"
+repository = "https://github.com/trissylegs/canva-connect-rust"
+homepage = "https://github.com/trissylegs/canva-connect-rust"
 documentation = "https://docs.rs/canva-connect"
 keywords = ["canva", "api", "client", "design", "graphics"]
 categories = ["api-bindings", "web-programming::http-client"]
