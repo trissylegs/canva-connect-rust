@@ -56,7 +56,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let access_token = env::var("CANVA_ACCESS_TOKEN")
         .map_err(|_| "CANVA_ACCESS_TOKEN environment variable not set")?;
 
-    let client = Client::new(AccessToken::new(access_token));
+    let client =
+        Client::new(AccessToken::new(access_token)).expect("Failed to create Canva client");
 
     #[cfg(feature = "observability")]
     info!("Starting Canva Connect API demonstration");

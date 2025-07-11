@@ -23,7 +23,8 @@
 //! // Initialize tracing with OTLP exporter
 //! let _guard = init_tracing("canva-connect-app", "http://localhost:4317").await?;
 //!
-//! let client = Client::new(AccessToken::new("token"));
+//! let client = Client::new(AccessToken::new("token"))
+//!     .expect("Failed to create client");
 //!
 //! // API calls will now be traced automatically
 //! let user = client.user().get_me().await.unwrap();

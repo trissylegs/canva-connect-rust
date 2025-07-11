@@ -24,7 +24,8 @@
 //!
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let client = Client::new(AccessToken::new("token"));
+//! let client = Client::new(AccessToken::new("token"))
+//!     .expect("Failed to create client");
 //!
 //! // Access the assets endpoint
 //! let assets = client.assets();
