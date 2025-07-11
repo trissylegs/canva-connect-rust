@@ -20,6 +20,7 @@
 - `cargo run --example designs` - Run design API example (needs .env setup)
 - `cargo run --example folders` - Run folder organization example (needs .env setup)
 - `cargo run --example observability --features observability` - Run observability example with tracing
+- `cargo run --example oauth_flow` - Run OAuth 2.0 with PKCE authentication flow example
 - `cargo run --example asset_upload -- --file path/to/file` - Run with custom file path
 - `cargo run --example url_asset_upload -- --url "https://rustacean.net/assets/rustacean-flat-happy.png"` - Run with custom URL
 
@@ -246,7 +247,7 @@ jq '.components.schemas | keys[] | select(contains("Design"))' public-api.json
 ```
 
 ## API Implementation Status
-- ✅ Core client with OAuth 2.0 authentication
+- ✅ Core client with OAuth 2.0 authentication with PKCE support
 - ✅ Rate limiting and error handling
 - ✅ Assets API (upload, get, update, delete)
 - ✅ Autofill API (create autofill jobs, get job status)
