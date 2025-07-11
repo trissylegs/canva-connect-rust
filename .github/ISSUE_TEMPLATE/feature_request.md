@@ -25,11 +25,13 @@ A clear and concise description of any alternative solutions or features you've 
 
 ## Tasks
 - [ ] Design the feature API
+- [ ] Create feature branch from main: `git checkout -b feature/issue-{number}-{description}`
 - [ ] Implement core functionality
 - [ ] Add comprehensive tests
 - [ ] Update documentation
 - [ ] Add usage examples
 - [ ] Ensure backward compatibility
+- [ ] Create pull request targeting main branch
 
 ## Files to create/modify
 - List files that will need to be created or modified
