@@ -37,8 +37,10 @@ governor = "0.6"
 nonzero_ext = "0.3"
 urlencoding = "2.1"
 dotenv = "0.15"
-hyper = { version = "0.14", features = ["full"] }
-webbrowser = "0.8"
+
+# OAuth flow example dependencies (optional)
+hyper = { version = "0.14", features = ["full"], optional = true }
+webbrowser = { version = "0.8", optional = true }
 
 # Observability dependencies (optional)
 opentelemetry = { version = "0.21", optional = true }
@@ -62,6 +64,7 @@ default = ["rustls-tls"]
 rustls-tls = ["reqwest/rustls-tls"]
 native-tls = ["reqwest/native-tls"]
 observability = ["opentelemetry", "opentelemetry_sdk", "opentelemetry-otlp", "tracing", "tracing-opentelemetry", "tracing-subscriber"]
+oauth-flow = ["hyper", "webbrowser"]
 
 [[example]]
 name = "asset_upload"
@@ -94,3 +97,4 @@ path = "examples/exports.rs"
 [[example]]
 name = "oauth_flow"
 path = "examples/oauth_flow.rs"
+required-features = ["oauth-flow"]
