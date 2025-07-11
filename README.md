@@ -25,21 +25,7 @@ tokio = { version = "1.0", features = ["full"] }
 
 ## Quick Start
 
-```rust,skt-connect,no_run
-use canva_connect::{Client, auth::AccessToken};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Create a client with your access token
-    let client = Client::new(AccessToken::new("your-access-token"));
-    
-    // Get user profile information
-    let profile = client.user().get_profile().await?;
-    println!("User: {}", profile.display_name);
-    
-    Ok(())
-}
-```
+See the [crate documentation](https://docs.rs/canva-connect) for comprehensive examples and usage patterns.
 
 ## Authentication
 
@@ -49,163 +35,19 @@ This library supports OAuth 2.0 authentication. You'll need to:
 2. Implement the OAuth flow to get an access token
 3. Use the access token to create a client
 
-```rust,skt-connect,no_run
-use canva_connect::{Client, auth::AccessToken};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Create a client with your access token
-    let client = Client::new(AccessToken::new("your-access-token"));
-    
-    // Use the client to make API calls
-    let profile = client.user().get_profile().await?;
-    println!("User: {}", profile.display_name);
-    
-    Ok(())
-}
-```
-
 > **Note**: Complete OAuth flow examples are coming soon. For now, obtain your access token through the [Canva Developer Portal](https://www.canva.dev/docs/connect/authentication/).
 
 ## Examples
 
-### Upload an Asset from File
+The [crate documentation](https://docs.rs/canva-connect) includes comprehensive, tested examples for:
+- **Asset Management** - Upload files and URLs, get/update metadata, manage tags
+- **Folder Organization** - Create folders, list contents, move items  
+- **Design Export** - Export designs to various formats (PNG, PDF, etc.)
+- **Error Handling** - Handle API errors, HTTP errors, and rate limiting
+- **Authentication** - OAuth flows and token management
+- **Rate Limiting** - Configure custom rate limits
 
-```rust,skt-connect,no_run
-use canva_connect::{Client, auth::AccessToken};
-use canva_connect::endpoints::assets::AssetUploadMetadata;
-use std::fs;
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::new(AccessToken::new("your-access-token"));
-    
-    // Read file
-    let file_data = fs::read("image.png")?;
-    
-    // Upload asset
-    let metadata = AssetUploadMetadata {
-        name: "My Image".to_string(),
-        tags: vec!["rust".to_string(), "upload".to_string()],
-    };
-    
-    let upload_job = client.assets().create_upload_job(file_data, metadata).await?;
-    let result = client.assets().wait_for_upload_job(&upload_job.id).await?;
-    
-    println!("Uploaded asset: {}", result.asset.id);
-    Ok(())
-}
-```
-
-### Upload an Asset from URL
-
-```rust,skt-connect,no_run
-use canva_connect::{Client, auth::AccessToken};
-use canva_connect::endpoints::assets::CreateUrlAssetUploadJobRequest;
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::new(AccessToken::new("your-access-token"));
-    
-    let request = CreateUrlAssetUploadJobRequest {
-        url: "https://example.com/image.png".to_string(),
-        name: "Image from URL".to_string(),
-    };
-    
-    let upload_job = client.assets().create_url_upload_job(request).await?;
-    let result = client.assets().wait_for_url_upload_job(&upload_job.id).await?;
-    
-    println!("Uploaded asset: {}", result.asset.id);
-    Ok(())
-}
-```
-
-### Get Asset Details
-
-```rust,skt-connect,no_run
-use canva_connect::{Client, auth::AccessToken};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::new(AccessToken::new("your-access-token"));
-    
-    // Get a specific asset by ID
-    let asset = client.assets().get("asset-id").await?;
-    println!("Asset: {} ({})", asset.name, asset.id);
-    
-    // Update asset metadata
-    let update_request = canva_connect::endpoints::assets::UpdateAssetRequest {
-        name: Some("Updated Asset Name".to_string()),
-        tags: Some(vec!["rust".to_string(), "api".to_string()]),
-    };
-    
-    let updated_asset = client.assets().update("asset-id", update_request).await?;
-    println!("Updated asset: {}", updated_asset.name);
-    
-    Ok(())
-}
-```
-
-### Create and Manage Folders
-
-```rust,skt-connect,no_run
-use canva_connect::{Client, auth::AccessToken};
-use canva_connect::endpoints::folders::{CreateFolderRequest, UpdateFolderRequest, MoveFolderItemRequest};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::new(AccessToken::new("your-access-token"));
-    
-    // Create a folder
-    let create_request = CreateFolderRequest {
-        name: "My Project".to_string(),
-        parent_folder_id: "root".to_string(),
-    };
-    
-    let folder_response = client.folders().create_folder(&create_request).await?;
-    let folder = &folder_response.folder;
-    println!("Created folder: {} (ID: {})", folder.name, folder.id);
-    
-    // List folder contents
-    let list_request = canva_connect::endpoints::folders::ListFolderItemsRequest {
-        limit: Some(50),
-        continuation: None,
-    };
-    
-    let items = client.folders().list_folder_items(&folder.id, &list_request).await?;
-    println!("Found {} items in folder", items.items.len());
-    
-    Ok(())
-}
-```
-
-### Export Designs
-
-```rust,skt-connect,no_run
-use canva_connect::{Client, auth::AccessToken};
-use canva_connect::endpoints::exports::{CreateExportJobRequest, ExportFormat};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::new(AccessToken::new("your-access-token"));
-    
-    // Create export job
-    let export_request = CreateExportJobRequest {
-        design_id: "design-id".to_string(),
-        format: ExportFormat::Png,
-        quality: Some("high".to_string()),
-    };
-    
-    let export_job = client.exports().create_export_job(&export_request).await?;
-    println!("Created export job: {}", export_job.id);
-    
-    // Wait for completion
-    let result = client.exports().wait_for_export_job(&export_job.id).await?;
-    println!("Export completed: {}", result.export_url);
-    
-    Ok(())
-}
-```
+All examples in the documentation are automatically tested to ensure they remain up-to-date and functional.
 
 ## Running Examples
 
@@ -339,46 +181,9 @@ cargo run --example url_asset_upload -- --url "https://example.com/image.png"
 
 Each endpoint has comprehensive examples demonstrating real-world usage patterns, error handling, and best practices.
 
-## Error Handling
+## Error Handling and Rate Limiting
 
-The library uses a comprehensive error system:
-
-
-```rust
-
-use canva_connect::{Client, auth::AccessToken, Error};
-let client = Client::new(AccessToken::new("your-access-token"));
-    
-match client.assets().get("invalid-id").await {
-        Ok(asset) => println!("Asset: {}", asset.name),
-        Err(Error::Api { code, message }) => {
-            println!("API error {}: {}", code, message);
-        }
-        Err(Error::Http(e)) => {
-            println!("HTTP error: {}", e);
-        }
-        Err(e) => {
-            println!("Other error: {}", e);
-        }
-    }
-    Ok(())
-
-```
-
-## Rate Limiting
-
-The client includes built-in rate limiting to respect API quotas:
-
-```rust,skt-connect,no_run
-use canva_connect::{Client, auth::AccessToken, rate_limit::ApiRateLimiter};
-
-# fn main() {
-# let access_token = AccessToken::new("token");
-// Create client with custom rate limiter
-let rate_limiter = ApiRateLimiter::new(30); // 30 requests per minute
-let client = Client::with_rate_limiter(access_token, rate_limiter);
-# }
-```
+The library includes comprehensive error handling and built-in rate limiting. See the [crate documentation](https://docs.rs/canva-connect) for detailed examples of error handling patterns and rate limiting configuration.
 
 ## Contributing
 

@@ -44,8 +44,8 @@ RUST_LOG=debug cargo run --example <example_name>
 This shows HTTP requests, response status codes, and timing information for debugging API interactions.
 
 ## Documentation Testing
-- `cargo test --test skeptic` - Test README.md code examples with skeptic (currently has dependency resolution issues)
-- Skeptic is configured to test all code examples in README.md for compilation
+- `cargo test --doc` - Test documentation examples
+- Documentation examples are tested as part of the standard test suite
 - Examples marked with `no_run` compile but don't execute (to avoid needing API tokens)
 
 ## Integration Tests
