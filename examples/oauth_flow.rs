@@ -23,6 +23,70 @@ use std::convert::Infallible;
 use std::sync::Arc;
 use tokio::sync::oneshot;
 use url::Url;
+use uuid::Uuid;
+
+// HTML templates as constants to prevent indentation issues
+const SUCCESS_HTML: &str = r#"<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth Success</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .success { color: #4CAF50; }
+        .container { max-width: 600px; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="success">✅ Authorization Successful!</h1>
+        <p>You have successfully authorized the application.</p>
+        <p>The authorization code has been received and the token exchange is in progress.</p>
+        <p>You can close this window and return to the terminal.</p>
+    </div>
+</body>
+</html>"#;
+
+const ERROR_HTML_TEMPLATE: &str = r#"<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth Error</title>
+    <meta charset="utf-8">
+    <style>
+        body {{ font-family: Arial, sans-serif; text-align: center; padding: 50px; }}
+        .error {{ color: #f44336; }}
+        .container {{ max-width: 600px; margin: 0 auto; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="error">❌ Authorization Failed</h1>
+        <p>Error: {error}</p>
+        <p>Description: {error_description}</p>
+        <p>Please try again or check your OAuth configuration.</p>
+    </div>
+</body>
+</html>"#;
+
+const INVALID_CALLBACK_HTML: &str = r#"<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth Error</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .error { color: #f44336; }
+        .container { max-width: 600px; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="error">❌ Invalid Callback</h1>
+        <p>The OAuth callback is missing required parameters.</p>
+        <p>Please check your OAuth configuration and try again.</p>
+    </div>
+</body>
+</html>"#;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -55,8 +119,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let client = OAuthClient::new(config);
 
+    // Generate a random state value for CSRF protection
+    let state = Uuid::new_v4().to_string();
+
     // Generate authorization URL with PKCE
-    let (auth_url, pkce_params) = client.authorization_url(Some("random-state-value"))?;
+    let (auth_url, pkce_params) = client.authorization_url(Some(&state))?;
 
     println!("🔐 PKCE Parameters Generated:");
     println!(
@@ -119,15 +186,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 Err(_) => {
                     println!("❌ Failed to receive authorization code");
-                    return Ok(());
+                    return Err("Failed to receive authorization code".into());
                 }
             }
         }
         result = server => {
             if let Err(e) = result {
                 println!("❌ Server error: {e}");
+                return Err(format!("Server error: {e}").into());
             }
-            return Ok(());
+            return Err("Server terminated unexpectedly".into());
         }
     };
 
@@ -136,7 +204,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Exchange code for access token using PKCE
     match client
-        .exchange_code_with_pkce(&auth_code, Some(&pkce_params))
+        .exchange_code_with_pkce(&auth_code, &pkce_params)
         .await
     {
         Ok(token_response) => {
@@ -145,6 +213,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("   Token Type: {}", token_response.token_type);
             if let Some(expires_in) = token_response.expires_in {
                 println!("   Expires In: {expires_in} seconds");
+            }
+            if let Some(refresh_token) = &token_response.refresh_token {
+                println!(
+                    "   Refresh Token: {}...",
+                    &refresh_token[..20.min(refresh_token.len())]
+                );
             }
             if let Some(scope) = &token_response.scope {
                 println!("   Granted Scopes: {scope}");
@@ -184,94 +258,31 @@ async fn handle_request(
                 }
 
                 // Return success page
-                let html = r#"
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>OAuth Success</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-                        .success { color: #4CAF50; }
-                        .container { max-width: 600px; margin: 0 auto; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <h1 class="success">✅ Authorization Successful!</h1>
-                        <p>You have successfully authorized the application.</p>
-                        <p>The authorization code has been received and the token exchange is in progress.</p>
-                        <p>You can close this window and return to the terminal.</p>
-                    </div>
-                </body>
-                </html>
-                "#;
-
                 Ok(Response::builder()
                     .status(StatusCode::OK)
-                    .header("Content-Type", "text/html")
-                    .body(Body::from(html))
+                    .header("Content-Type", "text/html; charset=utf-8")
+                    .body(Body::from(SUCCESS_HTML))
                     .unwrap())
             } else if let Some(error) = params.get("error") {
                 // Handle OAuth error
                 let default_error = "Unknown error".to_string();
                 let error_description = params.get("error_description").unwrap_or(&default_error);
 
-                let html = format!(
-                    r#"
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>OAuth Error</title>
-                        <style>
-                            body {{ font-family: Arial, sans-serif; text-align: center; padding: 50px; }}
-                            .error {{ color: #f44336; }}
-                            .container {{ max-width: 600px; margin: 0 auto; }}
-                        </style>
-                    </head>
-                    <body>
-                        <div class="container">
-                            <h1 class="error">❌ Authorization Failed</h1>
-                            <p>Error: {error}</p>
-                            <p>Description: {error_description}</p>
-                            <p>Please try again or check your OAuth configuration.</p>
-                        </div>
-                    </body>
-                    </html>
-                    "#
-                );
+                let html = ERROR_HTML_TEMPLATE
+                    .replace("{error}", error)
+                    .replace("{error_description}", error_description);
 
                 Ok(Response::builder()
                     .status(StatusCode::BAD_REQUEST)
-                    .header("Content-Type", "text/html")
+                    .header("Content-Type", "text/html; charset=utf-8")
                     .body(Body::from(html))
                     .unwrap())
             } else {
                 // Missing required parameters
-                let html = r#"
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>OAuth Error</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-                        .error { color: #f44336; }
-                        .container { max-width: 600px; margin: 0 auto; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <h1 class="error">❌ Invalid Callback</h1>
-                        <p>The OAuth callback is missing required parameters.</p>
-                        <p>Please check your OAuth configuration and try again.</p>
-                    </div>
-                </body>
-                </html>
-                "#;
-
                 Ok(Response::builder()
                     .status(StatusCode::BAD_REQUEST)
-                    .header("Content-Type", "text/html")
-                    .body(Body::from(html))
+                    .header("Content-Type", "text/html; charset=utf-8")
+                    .body(Body::from(INVALID_CALLBACK_HTML))
                     .unwrap())
             }
         }
