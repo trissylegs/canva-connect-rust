@@ -22,6 +22,13 @@
 - `cargo run --example asset_upload -- --file path/to/file` - Run with custom file path
 - `cargo run --example url_asset_upload -- --url "https://rustacean.net/assets/rustacean-flat-happy.png"` - Run with custom URL
 
+**Available examples for all APIs:**
+- `asset_upload` - Upload files as assets
+- `url_asset_upload` - Upload assets from URLs  
+- `designs` - Create and manage designs
+- `user_profile` - Get user information and capabilities
+- `observability` - Demonstrate tracing integration (requires `observability` feature)
+
 ## Documentation Testing
 - `cargo test --test skeptic` - Test README.md code examples with skeptic (currently has dependency resolution issues)
 - Skeptic is configured to test all code examples in README.md for compilation
@@ -90,10 +97,15 @@ Individual commands:
 - `src/models.rs` - Data structures for API responses
 - `src/rate_limit.rs` - Rate limiting implementation
 - `src/endpoints/` - API endpoint implementations
-  - `assets.rs` - Assets API (fully implemented)
-  - `designs.rs` - Designs API (fully implemented)
-  - `user.rs` - User API (fully implemented)
-  - `mod.rs` - Other endpoints (stub implementations)
+  - `assets.rs` - Assets API (upload, manage, retrieve)
+  - `autofill.rs` - Autofill API (brand template data autofill)
+  - `brand_templates.rs` - Brand Templates API (templates and datasets)
+  - `comments.rs` - Comments API (threads and replies)
+  - `designs.rs` - Designs API (create, list, get)
+  - `exports.rs` - Exports API (export to various formats)
+  - `folders.rs` - Folders API (organize content)
+  - `user.rs` - User API (profile, capabilities, identification)
+  - `mod.rs` - Module organization and endpoint exports
 
 ## Code Style
 - Use `async/await` for all API calls
@@ -108,6 +120,18 @@ Individual commands:
 
 ## API Design Patterns
 - **Tagged Unions (oneOf)**: The Canva API uses oneOf patterns with discriminator fields. In Rust, model these as enums with `#[serde(tag = "type", rename_all = "snake_case")]` instead of separate structs with explicit type fields. For example, `DesignTypeInput` is a tagged union with `Preset` and `Custom` variants where serde automatically handles the `type` discriminator field.
+
+## OAuth Scopes Required by APIs
+Different APIs require different OAuth scopes. Here's a quick reference:
+
+- **Assets API**: `asset:read`, `asset:write`
+- **Autofill API**: `brandtemplate:content:read` (for autofill operations)
+- **Brand Templates API**: `brandtemplate:meta:read`, `brandtemplate:content:read`
+- **Comments API**: `comment:read`, `comment:write`
+- **Designs API**: `design:meta:read`, `design:content:read`, `design:content:write`
+- **Exports API**: `design:content:read`
+- **Folders API**: `folder:read`, `folder:write`
+- **User API**: No specific scopes required (basic user info always accessible)
 
 ## API Specification
 The `public-api.json` file contains the complete OpenAPI 3.0 specification for the Canva Connect API. You can search it efficiently using `jq`:
@@ -130,11 +154,16 @@ jq '.components.schemas | keys[] | select(contains("Design"))' public-api.json
 - ✅ Core client with OAuth 2.0 authentication
 - ✅ Rate limiting and error handling
 - ✅ Assets API (upload, get, update, delete)
+- ✅ Autofill API (create autofill jobs, get job status)
+- ✅ Brand Templates API (list templates, get template details, get datasets)
+- ✅ Comments API (create/get threads, create/get/list replies)
 - ✅ Designs API (list, get, create)
+- ✅ Exports API (create export jobs, get job status, get export formats)
+- ✅ Folders API (create/get/update folders, list items, move items)
 - ✅ User API (profile, capabilities, identification)
 - ✅ Observability (OpenTelemetry tracing with feature flag)
 - ✅ Integration tests with automatic cleanup and rate limiting
-- 🚧 Other endpoints (stubs created, need implementation)
+- ✅ **Complete API coverage** - All major Canva Connect endpoints implemented
 
 ## Dependencies
 - `reqwest` - HTTP client with async support
