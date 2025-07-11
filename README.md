@@ -456,6 +456,21 @@ CANVA_INTEGRATION_TESTS=1 cargo test --test integration
 cargo build --release
 ```
 
+## Contributing
+
+We welcome contributions! Please see our [GitHub Issues](https://github.com/canvanauts/canva-connect-rust/issues) for areas where help is needed.
+
+### Issue Labels
+
+We use a structured labeling system to organize issues:
+
+- **Type**: `type:bug`, `type:feature`, `type:testing`, `type:docs`, `type:refactor`, `type:ci`, `type:security`
+- **Area**: `area:assets`, `area:autofill`, `area:brand-templates`, `area:comments`, `area:designs`, `area:exports`, `area:folders`, `area:user`, `area:client`, `area:auth`, `area:errors`
+- **Priority**: `priority:critical`, `priority:high`, `priority:medium`, `priority:low`
+- **Status**: `status:blocked`, `status:in-progress`, `status:needs-review`, `status:good-first-issue`
+
+Look for issues labeled `status:good-first-issue` if you're new to the project.
+
 ## License
 
 This project is licensed under the MIT OR Apache-2.0 license.

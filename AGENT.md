@@ -132,6 +132,53 @@ Individual commands:
 ## Security Guidelines
 - **Access tokens should never be passed via command line arguments** - they are visible in process lists, shell history, and logs. Always use .env files for credentials.
 
+## Issue Management and Labels
+
+### Issue Label Taxonomy
+We use a structured labeling system to organize GitHub issues:
+
+**Type Labels:**
+- `type:bug` - Bug fixes and error corrections
+- `type:feature` - New feature implementations
+- `type:testing` - Test additions and improvements
+- `type:docs` - Documentation updates and improvements
+- `type:refactor` - Code refactoring and cleanup
+- `type:ci` - CI/CD and build system changes
+- `type:security` - Security-related issues
+
+**Area Labels:**
+- `area:assets` - Assets API endpoints
+- `area:autofill` - Autofill API endpoints
+- `area:brand-templates` - Brand Templates API endpoints
+- `area:comments` - Comments API endpoints
+- `area:designs` - Designs API endpoints
+- `area:exports` - Exports API endpoints
+- `area:folders` - Folders API endpoints
+- `area:user` - User API endpoints
+- `area:client` - Core HTTP client functionality
+- `area:auth` - Authentication and OAuth flows
+- `area:errors` - Error handling and types
+
+**Priority Labels:**
+- `priority:critical` - Critical issues requiring immediate attention
+- `priority:high` - High priority issues for next release
+- `priority:medium` - Medium priority issues for future releases
+- `priority:low` - Low priority issues and nice-to-haves
+
+**Status Labels:**
+- `status:blocked` - Issues blocked by external dependencies
+- `status:in-progress` - Issues currently being worked on
+- `status:needs-review` - Issues ready for review
+- `status:good-first-issue` - Good for new contributors
+
+### Issue Creation Guidelines
+When creating issues:
+1. Use descriptive titles that clearly state the problem or feature
+2. Apply appropriate type, area, and priority labels
+3. Include acceptance criteria and task checklists
+4. Reference related files and line numbers
+5. For bugs, include reproduction steps and expected behavior
+
 ## API Design Patterns
 - **Tagged Unions (oneOf)**: The Canva API uses oneOf patterns with discriminator fields. In Rust, model these as enums with `#[serde(tag = "type", rename_all = "snake_case")]` instead of separate structs with explicit type fields. For example, `DesignTypeInput` is a tagged union with `Preset` and `Custom` variants where serde automatically handles the `type` discriminator field.
 - **Summary vs Full Models**: Some APIs return different levels of detail. Use separate `Summary` structs for listings (e.g., `DesignSummary` in `FolderItemSummary`) and full structs for detailed responses (e.g., `Design` from get endpoints). This prevents deserialization errors when optional fields like `owner` are missing in summary responses.

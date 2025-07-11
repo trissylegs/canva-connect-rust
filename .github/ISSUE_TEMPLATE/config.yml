@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📖 Documentation
+    url: https://docs.rs/canva-connect
+    about: Check the documentation for usage guides and API reference
+  - name: 💬 Discussions
+    url: https://github.com/canvanauts/canva-connect-rust/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 🐛 Canva Connect API Issues
+    url: https://www.canva.dev/docs/connect/
+    about: Report issues with the Canva Connect API itself
