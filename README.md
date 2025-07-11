@@ -49,37 +49,23 @@ This library supports OAuth 2.0 authentication. You'll need to:
 2. Implement the OAuth flow to get an access token
 3. Use the access token to create a client
 
-### OAuth Flow Example
-
 ```rust,skt-connect,no_run
-use canva_connect::auth::{OAuthClient, OAuthConfig, Scope};
 use canva_connect::{Client, auth::AccessToken};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Configure OAuth
-    let config = OAuthConfig::new(
-        "your-client-id",
-        "your-client-secret", 
-        "https://your-app.com/callback",
-        vec![Scope::AssetRead, Scope::AssetWrite]
-    );
-
-    let oauth_client = OAuthClient::new(config);
-
-    // Get authorization URL
-    let auth_url = oauth_client.authorization_url(Some("state123"))?;
-    println!("Visit: {}", auth_url);
-
-    // After user authorizes, exchange code for token
-    let token_response = oauth_client.exchange_code("authorization-code").await?;
-    let access_token = AccessToken::new(token_response.access_token);
-
-    // Create API client
-    let client = Client::new(access_token);
+    // Create a client with your access token
+    let client = Client::new(AccessToken::new("your-access-token"));
+    
+    // Use the client to make API calls
+    let profile = client.user().get_profile().await?;
+    println!("User: {}", profile.display_name);
+    
     Ok(())
 }
 ```
+
+> **Note**: Complete OAuth flow examples are coming soon. For now, obtain your access token through the [Canva Developer Portal](https://www.canva.dev/docs/connect/authentication/).
 
 ## Examples
 
