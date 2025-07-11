@@ -307,19 +307,23 @@ impl OAuthClient {
         code: &str,
         pkce: Option<&PkceParams>,
     ) -> Result<TokenExchangeResponse> {
-        let request = TokenExchangeRequest {
-            client_id: self.config.client_id.clone(),
-            client_secret: self.config.client_secret.clone(),
-            code: code.to_string(),
-            grant_type: "authorization_code".to_string(),
-            redirect_uri: self.config.redirect_uri.clone(),
-            code_verifier: pkce.map(|p| p.code_verifier.clone()),
-        };
+        let mut form_data = vec![
+            ("client_id", self.config.client_id.as_str()),
+            ("client_secret", self.config.client_secret.as_str()),
+            ("code", code),
+            ("grant_type", "authorization_code"),
+            ("redirect_uri", self.config.redirect_uri.as_str()),
+        ];
+
+        // Add code_verifier if PKCE is used
+        if let Some(pkce) = pkce {
+            form_data.push(("code_verifier", &pkce.code_verifier));
+        }
 
         let response = self
             .http_client
             .post("https://api.canva.com/rest/v1/oauth/token")
-            .json(&request)
+            .form(&form_data)
             .send()
             .await?;
 
