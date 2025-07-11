@@ -220,21 +220,19 @@ pub enum SortByType {
 pub struct BrandTemplate {
     /// Brand template ID
     pub id: String,
-    /// Brand template name
-    pub name: String,
-    /// Brand template description
-    pub description: Option<String>,
-    /// Brand template tags
-    pub tags: Vec<String>,
+    /// Brand template title
+    pub title: String,
     /// Brand template thumbnail
     pub thumbnail: Option<Thumbnail>,
-    /// Brand template URLs
-    pub urls: BrandTemplateUrls,
-    /// Whether the template has a dataset
-    pub has_dataset: bool,
+    /// Brand template view URL
+    pub view_url: String,
+    /// Brand template create URL
+    pub create_url: String,
     /// Brand template creation timestamp
+    #[serde(with = "chrono::serde::ts_seconds")]
     pub created_at: chrono::DateTime<chrono::Utc>,
     /// Brand template last updated timestamp
+    #[serde(with = "chrono::serde::ts_seconds")]
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
@@ -250,34 +248,41 @@ pub struct BrandTemplateUrls {
 /// Brand template dataset
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BrandTemplateDataset {
-    /// Dataset fields
-    pub fields: HashMap<String, DatasetField>,
+    /// Dataset fields (keyed by field name)
+    pub dataset: HashMap<String, DataField>,
 }
 
 /// Dataset field definition
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DatasetField {
-    /// Field type
-    #[serde(rename = "type")]
-    pub field_type: DatasetFieldType,
-    /// Field label
-    pub label: String,
-    /// Field description
-    pub description: Option<String>,
-    /// Whether the field is required
-    pub required: bool,
-}
-
-/// Dataset field type
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum DatasetFieldType {
+#[serde(tag = "type", rename_all = "lowercase")]
+pub enum DataField {
     /// Text field
-    Text,
+    Text {
+        /// Field label
+        label: Option<String>,
+        /// Field description
+        description: Option<String>,
+        /// Whether the field is required
+        required: Option<bool>,
+    },
     /// Image field
-    Image,
+    Image {
+        /// Field label
+        label: Option<String>,
+        /// Field description
+        description: Option<String>,
+        /// Whether the field is required
+        required: Option<bool>,
+    },
     /// Chart field
-    Chart,
+    Chart {
+        /// Field label
+        label: Option<String>,
+        /// Field description
+        description: Option<String>,
+        /// Whether the field is required
+        required: Option<bool>,
+    },
 }
 
 /// Folder metadata
@@ -325,67 +330,60 @@ pub struct Team {
 pub struct CommentThread {
     /// Thread ID
     pub id: String,
-    /// Thread type
-    #[serde(rename = "type")]
-    pub thread_type: CommentThreadType,
-    /// Thread context
-    pub context: CommentContext,
-    /// Thread timestamp
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    /// Thread author
-    pub author: CommentAuthor,
-    /// Thread content
-    pub content: CommentContent,
-    /// Thread replies
-    pub replies: Vec<CommentReply>,
-}
-
-/// Comment thread type
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum CommentThreadType {
-    /// Regular comment
-    Comment,
-    /// Suggestion
-    Suggestion,
-}
-
-/// Comment context
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CommentContext {
     /// Design ID
     pub design_id: String,
-    /// Page number (0-indexed)
-    pub page: u32,
-    /// Position coordinates
-    pub position: Option<CommentPosition>,
+    /// Thread type
+    pub thread_type: CommentThreadType,
+    /// Thread author
+    pub author: Option<SimpleUser>,
+    /// Thread creation timestamp (Unix timestamp in seconds)
+    #[serde(with = "chrono::serde::ts_seconds")]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    /// Thread last updated timestamp (Unix timestamp in seconds)
+    #[serde(with = "chrono::serde::ts_seconds")]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
-/// Comment position
+/// Simple user information for comments
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CommentPosition {
-    /// X coordinate
-    pub x: f64,
-    /// Y coordinate
-    pub y: f64,
-}
-
-/// Comment author
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CommentAuthor {
-    /// Author ID
+pub struct SimpleUser {
+    /// User ID
     pub id: String,
-    /// Author display name
+    /// User display name
     pub display_name: String,
-    /// Author profile photo URL
-    pub profile_photo_url: Option<String>,
+}
+
+/// Comment thread type (tagged union)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum CommentThreadType {
+    /// Regular comment
+    Comment {
+        /// Comment content
+        content: CommentContent,
+        /// User mentions in the comment
+        mentions: std::collections::HashMap<String, UserMention>,
+        /// Assigned user
+        assignee: Option<SimpleUser>,
+        /// User who resolved the comment
+        resolver: Option<SimpleUser>,
+    },
+    /// Suggestion
+    Suggestion {
+        /// Suggested edits
+        suggested_edits: Vec<SuggestedEdit>,
+        /// Suggestion status
+        status: SuggestionStatus,
+    },
 }
 
 /// Comment content
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CommentContent {
-    /// Comment text
-    pub text: String,
+    /// Comment content in plaintext
+    pub plaintext: String,
+    /// Comment content in markdown (optional)
+    pub markdown: Option<String>,
 }
 
 /// Comment reply
@@ -394,31 +392,145 @@ pub struct CommentReply {
     /// Reply ID
     pub id: String,
     /// Reply author
-    pub author: CommentAuthor,
+    pub author: Option<SimpleUser>,
     /// Reply content
     pub content: CommentContent,
-    /// Reply timestamp
+    /// Reply timestamp (Unix timestamp in seconds)
+    #[serde(with = "chrono::serde::ts_seconds")]
     pub created_at: chrono::DateTime<chrono::Utc>,
+    /// User mentions in the reply
+    pub mentions: std::collections::HashMap<String, UserMention>,
 }
 
-/// Export format
+/// User mention in a comment
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UserMention {
+    /// The mention tag in the format user_id:team_id
+    pub tag: String,
+    /// The mentioned user
+    pub user: TeamUserSummary,
+}
+
+/// Suggested edit in a suggestion thread
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SuggestedEdit {
+    /// Edit ID
+    pub id: String,
+    /// Edit type
+    #[serde(rename = "type")]
+    pub edit_type: String,
+    /// Edit description
+    pub description: String,
+}
+
+/// Suggestion status
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SuggestionStatus {
+    /// Suggestion is pending
+    Pending,
+    /// Suggestion has been accepted
+    Accepted,
+    /// Suggestion has been rejected
+    Rejected,
+}
+
+/// Response from creating a comment thread
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateThreadResponse {
+    /// The created thread
+    pub thread: CommentThread,
+}
+
+/// Export format (tagged union)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "lowercase")]
+pub enum ExportFormat {
+    /// PDF format
+    Pdf {
+        /// Export quality
+        #[serde(skip_serializing_if = "Option::is_none")]
+        export_quality: Option<ExportQuality>,
+        /// Paper size
+        #[serde(skip_serializing_if = "Option::is_none")]
+        size: Option<ExportPageSize>,
+        /// Pages to export (1-indexed)
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pages: Option<Vec<u32>>,
+    },
+    /// JPG format
+    Jpg {
+        /// Export quality
+        #[serde(skip_serializing_if = "Option::is_none")]
+        export_quality: Option<ExportQuality>,
+        /// JPEG compression quality (1-100)
+        quality: u8,
+        /// Height in pixels
+        #[serde(skip_serializing_if = "Option::is_none")]
+        height: Option<u32>,
+        /// Width in pixels
+        #[serde(skip_serializing_if = "Option::is_none")]
+        width: Option<u32>,
+        /// Pages to export (1-indexed)
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pages: Option<Vec<u32>>,
+    },
+    /// PNG format
+    Png {
+        /// Export quality
+        #[serde(skip_serializing_if = "Option::is_none")]
+        export_quality: Option<ExportQuality>,
+        /// Height in pixels
+        #[serde(skip_serializing_if = "Option::is_none")]
+        height: Option<u32>,
+        /// Width in pixels
+        #[serde(skip_serializing_if = "Option::is_none")]
+        width: Option<u32>,
+        /// Pages to export (1-indexed)
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pages: Option<Vec<u32>>,
+    },
+    /// PPTX format
+    Pptx {
+        /// Export quality
+        #[serde(skip_serializing_if = "Option::is_none")]
+        export_quality: Option<ExportQuality>,
+        /// Pages to export (1-indexed)
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pages: Option<Vec<u32>>,
+    },
+    /// GIF format
+    Gif {
+        /// Export quality
+        #[serde(skip_serializing_if = "Option::is_none")]
+        export_quality: Option<ExportQuality>,
+        /// Pages to export (1-indexed)
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pages: Option<Vec<u32>>,
+    },
+    /// MP4 format
+    Mp4 {
+        /// Export quality
+        #[serde(skip_serializing_if = "Option::is_none")]
+        export_quality: Option<ExportQuality>,
+        /// Pages to export (1-indexed)
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pages: Option<Vec<u32>>,
+    },
+}
+
+/// Export page size for PDF exports
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
-pub enum ExportFormat {
-    /// PNG format
-    Png,
-    /// JPG format
-    Jpg,
-    /// PDF format
-    Pdf,
-    /// SVG format
-    Svg,
-    /// GIF format
-    Gif,
-    /// MP4 format
-    Mp4,
-    /// PPTX format
-    Pptx,
+pub enum ExportPageSize {
+    /// A4 paper size
+    A4,
+    /// A3 paper size
+    A3,
+    /// Letter paper size
+    Letter,
+    /// Legal paper size
+    Legal,
 }
 
 /// Export quality

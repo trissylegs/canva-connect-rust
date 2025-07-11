@@ -70,3 +70,19 @@ path = "examples/observability.rs"
 [[example]]
 name = "url_asset_upload"
 path = "examples/url_asset_upload.rs"
+
+[[example]]
+name = "autofill"
+path = "examples/autofill.rs"
+
+[[example]]
+name = "brand_templates"
+path = "examples/brand_templates.rs"
+
+[[example]]
+name = "comments"
+path = "examples/comments.rs"
+
+[[example]]
+name = "exports"
+path = "examples/exports.rs"

@@ -7,7 +7,11 @@
 //! deprecated and new endpoints. This implementation focuses on the newer
 //! thread-based API.
 
-use crate::{client::Client, error::Result};
+use crate::{
+    client::Client,
+    error::Result,
+    models::{CommentReply, CommentThread, CreateThreadResponse},
+};
 use serde::{Deserialize, Serialize};
 
 /// Client for the Comments API
@@ -19,41 +23,29 @@ pub struct CommentsApi {
 /// Request to create a new comment thread
 #[derive(Debug, Clone, Serialize)]
 pub struct CreateThreadRequest {
-    /// The content of the comment
-    pub content: CommentContent,
-    /// The position of the comment on the design
+    /// The comment message in plaintext
+    pub message_plaintext: String,
+    /// Optional assignee ID
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub position: Option<CommentPosition>,
+    pub assignee_id: Option<String>,
 }
 
-/// Comment content
+/// Object to attach a comment to
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CommentContent {
-    /// The text content of the comment
-    pub text: String,
-}
-
-/// Position of a comment on a design
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CommentPosition {
-    /// X coordinate (0-1, relative to design width)
-    pub x: f64,
-    /// Y coordinate (0-1, relative to design height)
-    pub y: f64,
-}
-
-/// Response from creating a comment thread
-#[derive(Debug, Clone, Deserialize)]
-pub struct CreateThreadResponse {
-    /// The created thread
-    pub thread: CommentThread,
+#[serde(tag = "type", rename_all = "lowercase")]
+pub enum CommentObjectInput {
+    /// Design comment object
+    Design {
+        /// The ID of the design
+        design_id: String,
+    },
 }
 
 /// Request to create a reply to a comment thread
 #[derive(Debug, Clone, Serialize)]
 pub struct CreateReplyRequest {
-    /// The content of the reply
-    pub content: CommentContent,
+    /// The reply comment message in plaintext
+    pub message_plaintext: String,
 }
 
 /// Response from creating a reply
@@ -85,52 +77,6 @@ pub struct ListRepliesResponse {
     /// Continuation token for pagination
     #[serde(skip_serializing_if = "Option::is_none")]
     pub continuation: Option<String>,
-}
-
-/// A comment thread
-#[derive(Debug, Clone, Deserialize)]
-pub struct CommentThread {
-    /// Thread ID
-    pub id: String,
-    /// The content of the thread
-    pub content: CommentContent,
-    /// Author information
-    pub author: CommentAuthor,
-    /// When the thread was created (Unix timestamp)
-    pub created_at: i64,
-    /// Position of the comment on the design
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub position: Option<CommentPosition>,
-    /// Whether the thread is resolved
-    #[serde(default)]
-    pub resolved: bool,
-}
-
-/// A comment reply
-#[derive(Debug, Clone, Deserialize)]
-pub struct CommentReply {
-    /// Reply ID
-    pub id: String,
-    /// Thread ID this reply belongs to
-    pub thread_id: String,
-    /// The content of the reply
-    pub content: CommentContent,
-    /// Author information
-    pub author: CommentAuthor,
-    /// When the reply was created (Unix timestamp)
-    pub created_at: i64,
-}
-
-/// Comment author information
-#[derive(Debug, Clone, Deserialize)]
-pub struct CommentAuthor {
-    /// Author ID
-    pub id: String,
-    /// Author display name
-    pub display_name: String,
-    /// Author email (if available)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
 }
 
 /// Request parameters for listing replies

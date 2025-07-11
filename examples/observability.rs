@@ -27,6 +27,10 @@ use tracing::{info, warn};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Enable debug logging
+    env::set_var("RUST_LOG", "debug");
+    env_logger::init();
+
     // Load environment variables
     dotenv::dotenv().ok();
 

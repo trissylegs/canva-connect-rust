@@ -6,9 +6,10 @@
 use crate::{
     client::Client,
     error::Result,
-    models::{BrandTemplate, BrandTemplateDataset},
+    models::{BrandTemplate, DataField},
 };
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// Client for the Brand Templates API
 #[derive(Debug, Clone)]
@@ -47,8 +48,8 @@ pub struct GetBrandTemplateResponse {
 /// Response from getting a brand template dataset
 #[derive(Debug, Clone, Deserialize)]
 pub struct GetBrandTemplateDatasetResponse {
-    /// The brand template dataset
-    pub dataset: BrandTemplateDataset,
+    /// The brand template dataset fields (keyed by field name)
+    pub dataset: HashMap<String, DataField>,
 }
 
 impl BrandTemplatesApi {

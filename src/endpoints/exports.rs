@@ -43,7 +43,89 @@ pub struct GetDesignExportJobResponse {
 #[derive(Debug, Clone, Deserialize)]
 pub struct GetDesignExportFormatsResponse {
     /// Available formats for the design
-    pub formats: Vec<ExportFormat>,
+    pub formats: ExportFormatOptions,
+}
+
+/// Available export format options
+#[derive(Debug, Clone, Deserialize)]
+pub struct ExportFormatOptions {
+    /// PDF export option
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pdf: Option<PdfExportFormatOption>,
+    /// JPG export option
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub jpg: Option<JpgExportFormatOption>,
+    /// PNG export option
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub png: Option<PngExportFormatOption>,
+    /// SVG export option
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub svg: Option<SvgExportFormatOption>,
+    /// PPTX export option
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pptx: Option<PptxExportFormatOption>,
+    /// GIF export option
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gif: Option<GifExportFormatOption>,
+    /// MP4 export option
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mp4: Option<Mp4ExportFormatOption>,
+}
+
+/// PDF export format option
+#[derive(Debug, Clone, Deserialize)]
+pub struct PdfExportFormatOption {
+    /// Whether PDF export is available
+    #[serde(default)]
+    pub available: bool,
+}
+
+/// JPG export format option
+#[derive(Debug, Clone, Deserialize)]
+pub struct JpgExportFormatOption {
+    /// Whether JPG export is available
+    #[serde(default)]
+    pub available: bool,
+}
+
+/// PNG export format option
+#[derive(Debug, Clone, Deserialize)]
+pub struct PngExportFormatOption {
+    /// Whether PNG export is available
+    #[serde(default)]
+    pub available: bool,
+}
+
+/// SVG export format option
+#[derive(Debug, Clone, Deserialize)]
+pub struct SvgExportFormatOption {
+    /// Whether SVG export is available
+    #[serde(default)]
+    pub available: bool,
+}
+
+/// PPTX export format option
+#[derive(Debug, Clone, Deserialize)]
+pub struct PptxExportFormatOption {
+    /// Whether PPTX export is available
+    #[serde(default)]
+    pub available: bool,
+}
+
+/// GIF export format option
+#[derive(Debug, Clone, Deserialize)]
+pub struct GifExportFormatOption {
+    /// Whether GIF export is available
+    #[serde(default)]
+    pub available: bool,
+}
+
+/// MP4 export format option
+#[derive(Debug, Clone, Deserialize)]
+pub struct Mp4ExportFormatOption {
+    /// Whether MP4 export is available
+    #[serde(default)]
+    pub available: bool,
 }
 
 impl ExportsApi {
