@@ -20,8 +20,6 @@
 - `cargo run --example designs` - Run design API example (needs .env setup)
 - `cargo run --example folders` - Run folder organization example (needs .env setup)
 - `cargo run --example observability --features observability` - Run observability example with tracing
-- `cargo run --example asset_upload -- --file path/to/file` - Run with custom file path
-- `cargo run --example url_asset_upload -- --url "https://rustacean.net/assets/rustacean-flat-happy.png"` - Run with custom URL
 
 **Complete Examples for All 34 API Endpoints:**
 - `asset_upload` - Upload files as assets (3 endpoints: create_upload_job, get_upload_job, wait_for_upload_job)
