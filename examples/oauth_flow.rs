@@ -20,15 +20,24 @@ use std::io::{self, Write};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
+    dotenv::dotenv().ok();
 
     println!("OAuth 2.0 with PKCE Example");
     println!("===========================\n");
 
+    // Load OAuth configuration from environment variables
+    let client_id =
+        std::env::var("CANVA_CLIENT_ID").unwrap_or_else(|_| "your-client-id".to_string());
+    let client_secret =
+        std::env::var("CANVA_CLIENT_SECRET").unwrap_or_else(|_| "your-client-secret".to_string());
+    let redirect_uri = std::env::var("CANVA_REDIRECT_URI")
+        .unwrap_or_else(|_| "http://localhost:8080/callback".to_string());
+
     // Create OAuth configuration
     let config = OAuthConfig::new(
-        "your-client-id",
-        "your-client-secret",
-        "http://localhost:8080/callback",
+        client_id,
+        client_secret,
+        redirect_uri,
         vec![
             Scope::DesignMetaRead,
             Scope::DesignContentRead,
