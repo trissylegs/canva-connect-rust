@@ -16,7 +16,6 @@ async fn test_token_store_basic_operations() {
     let token_set = TokenSet {
         access_token: "test_access_token".to_string(),
         refresh_token: Some("test_refresh_token".to_string()),
-        token_type: "Bearer".to_string(),
         expires_at: Some(Instant::now() + Duration::from_secs(3600)),
         scope: Some("asset:read asset:write".to_string()),
     };
@@ -27,7 +26,7 @@ async fn test_token_store_basic_operations() {
     let stored = store.get().await.unwrap();
     assert_eq!(stored.access_token, token_set.access_token);
     assert_eq!(stored.refresh_token, token_set.refresh_token);
-    assert_eq!(stored.token_type, token_set.token_type);
+
     assert_eq!(stored.scope, token_set.scope);
 
     // Verify access token retrieval
@@ -48,7 +47,7 @@ async fn test_token_set_expiry() {
     let mut token_set = TokenSet {
         access_token: "test_token".to_string(),
         refresh_token: None,
-        token_type: "Bearer".to_string(),
+
         expires_at: Some(Instant::now() + Duration::from_secs(3600)),
         scope: None,
     };
@@ -80,7 +79,7 @@ async fn test_token_set_from_exchange_response() {
     let token_set = TokenSet::from_exchange_response(response);
 
     assert_eq!(token_set.access_token, "test_access_token");
-    assert_eq!(token_set.token_type, "Bearer");
+
     assert_eq!(
         token_set.refresh_token,
         Some("test_refresh_token".to_string())
@@ -110,7 +109,7 @@ async fn test_token_store_expired_token() {
     let token_set = TokenSet {
         access_token: "expired_token".to_string(),
         refresh_token: Some("test_refresh_token".to_string()),
-        token_type: "Bearer".to_string(),
+
         expires_at: Some(Instant::now() - Duration::from_secs(1)),
         scope: None,
     };
@@ -171,7 +170,7 @@ async fn test_oauth_client_with_custom_token_store() {
     let token_set = TokenSet {
         access_token: "custom_token".to_string(),
         refresh_token: None,
-        token_type: "Bearer".to_string(),
+
         expires_at: Some(Instant::now() + Duration::from_secs(3600)),
         scope: None,
     };
@@ -199,7 +198,7 @@ async fn test_token_store_thread_safety() {
         let token_set = TokenSet {
             access_token: "token1".to_string(),
             refresh_token: None,
-            token_type: "Bearer".to_string(),
+
             expires_at: Some(Instant::now() + Duration::from_secs(3600)),
             scope: None,
         };
@@ -243,7 +242,7 @@ async fn test_token_clear_functionality() {
     let token_set = TokenSet {
         access_token: "test_token".to_string(),
         refresh_token: Some("refresh_token".to_string()),
-        token_type: "Bearer".to_string(),
+
         expires_at: Some(Instant::now() + Duration::from_secs(3600)),
         scope: None,
     };
@@ -300,7 +299,7 @@ mod oauth_client_tests {
         let token_set = TokenSet {
             access_token: "test_token".to_string(),
             refresh_token: Some("refresh_token".to_string()),
-            token_type: "Bearer".to_string(),
+
             expires_at: Some(Instant::now() + Duration::from_secs(3600)),
             scope: None,
         };

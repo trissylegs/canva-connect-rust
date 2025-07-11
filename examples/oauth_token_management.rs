@@ -59,7 +59,7 @@ async fn main() -> Result<()> {
     let example_token_set = canva_connect::auth::TokenSet {
         access_token: "example_access_token".to_string(),
         refresh_token: Some("example_refresh_token".to_string()),
-        token_type: "Bearer".to_string(),
+
         expires_at: Some(std::time::Instant::now() + std::time::Duration::from_secs(3600)),
         scope: Some("asset:read asset:write".to_string()),
     };
@@ -98,7 +98,7 @@ async fn main() -> Result<()> {
     let shared_token_set = canva_connect::auth::TokenSet {
         access_token: "shared_access_token".to_string(),
         refresh_token: Some("shared_refresh_token".to_string()),
-        token_type: "Bearer".to_string(),
+
         expires_at: Some(std::time::Instant::now() + std::time::Duration::from_secs(3600)),
         scope: Some("asset:read".to_string()),
     };
@@ -117,7 +117,7 @@ async fn main() -> Result<()> {
     let expired_token_set = canva_connect::auth::TokenSet {
         access_token: "expired_access_token".to_string(),
         refresh_token: Some("valid_refresh_token".to_string()),
-        token_type: "Bearer".to_string(),
+
         expires_at: Some(std::time::Instant::now() - std::time::Duration::from_secs(1)),
         scope: Some("asset:read".to_string()),
     };

@@ -64,7 +64,7 @@ async fn test_refresh_token_error_handling() {
     let token_set = canva_connect::auth::TokenSet {
         access_token: "test_token".to_string(),
         refresh_token: None,
-        token_type: "Bearer".to_string(),
+
         expires_at: Some(std::time::Instant::now() + Duration::from_secs(3600)),
         scope: None,
     };
@@ -123,7 +123,7 @@ async fn test_token_auto_refresh_scenario() {
     let token_set = canva_connect::auth::TokenSet {
         access_token: "expired_token".to_string(),
         refresh_token: Some("valid_refresh_token".to_string()),
-        token_type: "Bearer".to_string(),
+
         expires_at: Some(std::time::Instant::now() - Duration::from_secs(1)),
         scope: None,
     };
@@ -152,7 +152,7 @@ async fn test_concurrent_token_operations() {
     let token_set = canva_connect::auth::TokenSet {
         access_token: "valid_token".to_string(),
         refresh_token: Some("refresh_token".to_string()),
-        token_type: "Bearer".to_string(),
+
         expires_at: Some(std::time::Instant::now() + Duration::from_secs(3600)),
         scope: None,
     };
@@ -195,7 +195,7 @@ async fn create_client_with_token(
     let token_set = canva_connect::auth::TokenSet {
         access_token: access_token.to_string(),
         refresh_token: refresh_token.map(|t| t.to_string()),
-        token_type: "Bearer".to_string(),
+
         expires_at: Some(std::time::Instant::now() + Duration::from_secs(expires_in_secs)),
         scope: None,
     };
@@ -223,7 +223,7 @@ async fn test_token_lifecycle_management() {
     let token_set = canva_connect::auth::TokenSet {
         access_token: "test_token".to_string(),
         refresh_token: Some("refresh_token".to_string()),
-        token_type: "Bearer".to_string(),
+
         expires_at: Some(std::time::Instant::now() + Duration::from_secs(3600)),
         scope: Some("asset:read".to_string()),
     };
@@ -261,7 +261,7 @@ async fn test_token_store_sharing() {
     let token_set = canva_connect::auth::TokenSet {
         access_token: "shared_token".to_string(),
         refresh_token: None,
-        token_type: "Bearer".to_string(),
+
         expires_at: Some(std::time::Instant::now() + Duration::from_secs(3600)),
         scope: None,
     };

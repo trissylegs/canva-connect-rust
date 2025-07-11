@@ -343,7 +343,6 @@ pub struct TokenExchangeResponse {
 pub struct TokenSet {
     pub access_token: String,
     pub refresh_token: Option<String>,
-    pub token_type: String,
     pub expires_at: Option<Instant>,
     pub scope: Option<String>,
 }
@@ -358,7 +357,6 @@ impl TokenSet {
         Self {
             access_token: response.access_token,
             refresh_token: response.refresh_token,
-            token_type: response.token_type,
             expires_at,
             scope: response.scope,
         }
