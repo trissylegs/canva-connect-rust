@@ -98,3 +98,7 @@ path = "examples/exports.rs"
 name = "oauth_flow"
 path = "examples/oauth_flow.rs"
 required-features = ["oauth-flow"]
+
+[[example]]
+name = "oauth_token_management"
+path = "examples/oauth_token_management.rs"

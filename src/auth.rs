@@ -1,7 +1,77 @@
 //! Authentication types and utilities for the Canva Connect API
 //!
-//! This module provides OAuth 2.0 authentication support for the Canva Connect API,
-//! including access token management and OAuth scope documentation.
+//! This module provides comprehensive OAuth 2.0 authentication support for the Canva Connect API,
+//! including access token management, refresh token handling, token introspection, and revocation.
+//!
+//! ## Features
+//!
+//! - **Token Storage**: Thread-safe token storage with automatic expiry management
+//! - **Auto-refresh**: Automatic token refresh when access tokens expire
+//! - **Token Introspection**: Check token validity and metadata
+//! - **Token Revocation**: Revoke access and refresh tokens
+//! - **Thread Safety**: All operations are safe for concurrent use
+//!
+//! ## Basic Usage
+//!
+//! ```rust
+//! use canva_connect::auth::{OAuthConfig, OAuthClient, Scope};
+//!
+//! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+//! // Create OAuth configuration
+//! let config = OAuthConfig::new(
+//!     "your_client_id",
+//!     "your_client_secret",
+//!     "https://your-app.com/callback",
+//!     vec![Scope::AssetRead, Scope::AssetWrite],
+//! );
+//!
+//! // Create OAuth client with automatic token management
+//! let client = OAuthClient::new(config);
+//!
+//! // Get authorization URL
+//! let auth_url = client.authorization_url(Some("state"))?;
+//!
+//! // After user authorizes, exchange the code for tokens
+//! let token_response = client.exchange_code("authorization_code").await?;
+//!
+//! // Get access token (automatically refreshes if expired)
+//! let access_token = client.get_access_token().await?;
+//!
+//! // Check if current token is valid
+//! let is_valid = client.is_token_valid().await;
+//!
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Advanced Token Management
+//!
+//! ```rust
+//! use canva_connect::auth::{OAuthClient, OAuthConfig, TokenStore, Scope};
+//!
+//! # async fn advanced_example() -> Result<(), Box<dyn std::error::Error>> {
+//! # let config = OAuthConfig::new("id", "secret", "uri", vec![]);
+//! # let client = OAuthClient::new(config.clone());
+//! // Manually refresh tokens
+//! let refreshed_tokens = client.refresh_token().await?;
+//!
+//! // Introspect a token
+//! let introspection = client.introspect_token("token_to_check").await?;
+//! if introspection.active {
+//!     println!("Token is valid");
+//! }
+//!
+//! // Revoke a token
+//! client.revoke_token("token_to_revoke", Some("access_token")).await?;
+//!
+//! // Share token store between multiple clients
+//! let shared_store = TokenStore::new();
+//! let client1 = OAuthClient::with_token_store(config.clone(), shared_store.clone());
+//! let client2 = OAuthClient::with_token_store(config, shared_store);
+//!
+//! # Ok(())
+//! # }
+//! ```
 
 pub mod scopes;
 
@@ -11,6 +81,9 @@ use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::fmt;
+use std::sync::Arc;
+use std::time::{Duration, Instant};
+use tokio::sync::RwLock;
 
 /// OAuth 2.0 access token for authenticating with the Canva Connect API
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -256,7 +329,7 @@ pub struct TokenExchangeRequest {
 }
 
 /// Token exchange response from OAuth 2.0
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct TokenExchangeResponse {
     pub access_token: String,
     pub token_type: String,
@@ -265,11 +338,153 @@ pub struct TokenExchangeResponse {
     pub scope: Option<String>,
 }
 
-/// OAuth 2.0 client for handling the authorization flow
-#[derive(Debug)]
+/// Represents a complete OAuth 2.0 token set with expiry information
+#[derive(Debug, Clone)]
+pub struct TokenSet {
+    pub access_token: String,
+    pub refresh_token: Option<String>,
+    pub token_type: String,
+    pub expires_at: Option<Instant>,
+    pub scope: Option<String>,
+}
+
+impl TokenSet {
+    /// Create a new token set from a token exchange response
+    pub fn from_exchange_response(response: TokenExchangeResponse) -> Self {
+        let expires_at = response
+            .expires_in
+            .map(|expires_in| Instant::now() + Duration::from_secs(expires_in));
+
+        Self {
+            access_token: response.access_token,
+            refresh_token: response.refresh_token,
+            token_type: response.token_type,
+            expires_at,
+            scope: response.scope,
+        }
+    }
+
+    /// Check if the access token is expired or will expire soon
+    pub fn is_expired(&self) -> bool {
+        self.expires_at
+            .map(|expires_at| Instant::now() >= expires_at)
+            .unwrap_or(false)
+    }
+
+    /// Check if the access token will expire within the given duration
+    pub fn expires_within(&self, duration: Duration) -> bool {
+        self.expires_at
+            .map(|expires_at| Instant::now() + duration >= expires_at)
+            .unwrap_or(false)
+    }
+
+    /// Get the access token as an AccessToken instance
+    pub fn access_token(&self) -> AccessToken {
+        AccessToken::new(&self.access_token)
+    }
+}
+
+/// Thread-safe token storage for OAuth 2.0 tokens
+#[derive(Debug, Clone)]
+pub struct TokenStore {
+    tokens: Arc<RwLock<Option<TokenSet>>>,
+}
+
+impl TokenStore {
+    /// Create a new empty token store
+    pub fn new() -> Self {
+        Self {
+            tokens: Arc::new(RwLock::new(None)),
+        }
+    }
+
+    /// Store a token set
+    pub async fn store(&self, token_set: TokenSet) {
+        let mut tokens = self.tokens.write().await;
+        *tokens = Some(token_set);
+    }
+
+    /// Get the current token set
+    pub async fn get(&self) -> Option<TokenSet> {
+        let tokens = self.tokens.read().await;
+        tokens.clone()
+    }
+
+    /// Get the current access token if available and not expired
+    pub async fn get_valid_access_token(&self) -> Option<AccessToken> {
+        let tokens = self.tokens.read().await;
+        if let Some(token_set) = tokens.as_ref() {
+            if !token_set.is_expired() {
+                return Some(token_set.access_token());
+            }
+        }
+        None
+    }
+
+    /// Check if we have a valid refresh token
+    pub async fn has_refresh_token(&self) -> bool {
+        let tokens = self.tokens.read().await;
+        tokens
+            .as_ref()
+            .and_then(|t| t.refresh_token.as_ref())
+            .is_some()
+    }
+
+    /// Clear all stored tokens
+    pub async fn clear(&self) {
+        let mut tokens = self.tokens.write().await;
+        *tokens = None;
+    }
+}
+
+impl Default for TokenStore {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Token refresh request for OAuth 2.0
+#[derive(Debug, Serialize)]
+pub struct TokenRefreshRequest {
+    pub client_id: String,
+    pub client_secret: String,
+    pub refresh_token: String,
+    pub grant_type: String,
+}
+
+/// Token introspection request
+#[derive(Debug, Serialize)]
+pub struct TokenIntrospectionRequest {
+    pub token: String,
+    pub client_id: String,
+    pub client_secret: String,
+}
+
+/// Token introspection response
+#[derive(Debug, Deserialize)]
+pub struct TokenIntrospectionResponse {
+    pub active: bool,
+    pub exp: Option<u64>,
+    pub scope: Option<String>,
+    pub client_id: Option<String>,
+    pub username: Option<String>,
+}
+
+/// Token revocation request
+#[derive(Debug, Serialize)]
+pub struct TokenRevocationRequest {
+    pub token: String,
+    pub client_id: String,
+    pub client_secret: String,
+    pub token_type_hint: Option<String>,
+}
+
+/// OAuth 2.0 client for handling the authorization flow with token management
+#[derive(Debug, Clone)]
 pub struct OAuthClient {
     config: OAuthConfig,
     http_client: reqwest::Client,
+    token_store: TokenStore,
 }
 
 impl OAuthClient {
@@ -278,6 +493,16 @@ impl OAuthClient {
         Self {
             config,
             http_client: reqwest::Client::new(),
+            token_store: TokenStore::new(),
+        }
+    }
+
+    /// Create a new OAuth client with a custom token store
+    pub fn with_token_store(config: OAuthConfig, token_store: TokenStore) -> Self {
+        Self {
+            config,
+            http_client: reqwest::Client::new(),
+            token_store,
         }
     }
 
@@ -310,7 +535,7 @@ impl OAuthClient {
         ))
     }
 
-    /// Exchange authorization code for access token with PKCE
+    /// Exchange authorization code for access token with PKCE and store it
     ///
     /// PKCE is required for the Canva Connect API.
     pub async fn exchange_code_with_pkce(
@@ -336,11 +561,153 @@ impl OAuthClient {
 
         if response.status().is_success() {
             let token_response: TokenExchangeResponse = response.json().await?;
+
+            // Store the tokens
+            let token_set = TokenSet::from_exchange_response(token_response.clone());
+            self.token_store.store(token_set).await;
+
             Ok(token_response)
         } else {
             let error_text = response.text().await?;
             Err(Error::Auth(format!("Token exchange failed: {error_text}")))
         }
+    }
+
+    /// Get a valid access token, refreshing if necessary
+    pub async fn get_access_token(&self) -> Result<AccessToken> {
+        // First, try to get a valid non-expired token
+        if let Some(token) = self.token_store.get_valid_access_token().await {
+            return Ok(token);
+        }
+
+        // If no valid token, try to refresh
+        if self.token_store.has_refresh_token().await {
+            self.refresh_token().await?;
+            return self
+                .token_store
+                .get_valid_access_token()
+                .await
+                .ok_or_else(|| {
+                    Error::Auth("Failed to get access token after refresh".to_string())
+                });
+        }
+
+        Err(Error::Auth(
+            "No valid access token available and no refresh token".to_string(),
+        ))
+    }
+
+    /// Refresh the access token using the refresh token
+    pub async fn refresh_token(&self) -> Result<TokenExchangeResponse> {
+        let current_tokens = self
+            .token_store
+            .get()
+            .await
+            .ok_or_else(|| Error::Auth("No tokens available for refresh".to_string()))?;
+
+        let refresh_token = current_tokens
+            .refresh_token
+            .ok_or_else(|| Error::Auth("No refresh token available".to_string()))?;
+
+        let request = TokenRefreshRequest {
+            client_id: self.config.client_id.clone(),
+            client_secret: self.config.client_secret.clone(),
+            refresh_token,
+            grant_type: "refresh_token".to_string(),
+        };
+
+        let response = self
+            .http_client
+            .post("https://api.canva.com/rest/v1/oauth/token")
+            .json(&request)
+            .send()
+            .await?;
+
+        if response.status().is_success() {
+            let token_response: TokenExchangeResponse = response.json().await?;
+
+            // Store the new tokens
+            let token_set = TokenSet::from_exchange_response(token_response.clone());
+            self.token_store.store(token_set).await;
+
+            Ok(token_response)
+        } else {
+            let error_text = response.text().await?;
+            Err(Error::Auth(format!("Token refresh failed: {error_text}")))
+        }
+    }
+
+    /// Introspect a token to check its validity and metadata
+    pub async fn introspect_token(&self, token: &str) -> Result<TokenIntrospectionResponse> {
+        let request = TokenIntrospectionRequest {
+            token: token.to_string(),
+            client_id: self.config.client_id.clone(),
+            client_secret: self.config.client_secret.clone(),
+        };
+
+        let response = self
+            .http_client
+            .post("https://api.canva.com/rest/v1/oauth/introspect")
+            .json(&request)
+            .send()
+            .await?;
+
+        if response.status().is_success() {
+            let introspection_response: TokenIntrospectionResponse = response.json().await?;
+            Ok(introspection_response)
+        } else {
+            let error_text = response.text().await?;
+            Err(Error::Auth(format!(
+                "Token introspection failed: {error_text}"
+            )))
+        }
+    }
+
+    /// Revoke a token (access or refresh token)
+    pub async fn revoke_token(&self, token: &str, token_type_hint: Option<&str>) -> Result<()> {
+        let request = TokenRevocationRequest {
+            token: token.to_string(),
+            client_id: self.config.client_id.clone(),
+            client_secret: self.config.client_secret.clone(),
+            token_type_hint: token_type_hint.map(|s| s.to_string()),
+        };
+
+        let response = self
+            .http_client
+            .post("https://api.canva.com/rest/v1/oauth/revoke")
+            .json(&request)
+            .send()
+            .await?;
+
+        if response.status().is_success() {
+            // Clear stored tokens if we revoked the current access token
+            if let Some(current_tokens) = self.token_store.get().await {
+                if current_tokens.access_token == token {
+                    self.token_store.clear().await;
+                }
+            }
+            Ok(())
+        } else {
+            let error_text = response.text().await?;
+            Err(Error::Auth(format!(
+                "Token revocation failed: {error_text}"
+            )))
+        }
+    }
+
+    /// Get the current token store
+    pub fn token_store(&self) -> &TokenStore {
+        &self.token_store
+    }
+
+    /// Check if the current token is valid (not expired)
+    pub async fn is_token_valid(&self) -> bool {
+        self.token_store.get_valid_access_token().await.is_some()
+    }
+
+    /// Clear all stored tokens
+    pub async fn clear_tokens(&self) {
+        self.token_store.clear().await;
     }
 }
 
