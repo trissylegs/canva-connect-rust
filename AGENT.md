@@ -135,18 +135,18 @@ Individual commands:
 ## Issue Management and Labels
 
 ### Issue Label Taxonomy
-We use a structured labeling system to organize GitHub issues:
+We use a structured labeling system to organize GitHub issues. All labels are created and actively used on the repository:
 
 **Type Labels:**
-- `type:bug` - Bug fixes and error corrections
-- `type:feature` - New feature implementations
-- `type:testing` - Test additions and improvements
-- `type:docs` - Documentation updates and improvements
-- `type:refactor` - Code refactoring and cleanup
-- `type:ci` - CI/CD and build system changes
-- `type:security` - Security-related issues
+- `type:bug` - Bug fixes and error corrections (red #d73a4a)
+- `type:feature` - New feature implementations (light blue #a2eeef)
+- `type:testing` - Test additions and improvements (green #0e8a16)
+- `type:docs` - Documentation updates and improvements (blue #0075ca)
+- `type:refactor` - Code refactoring and cleanup (yellow #fbca04)
+- `type:ci` - CI/CD and build system changes (light orange #f9d0c4)
+- `type:security` - Security-related issues (dark red #b60205)
 
-**Area Labels:**
+**Area Labels:** (All light green #c2e0c6)
 - `area:assets` - Assets API endpoints
 - `area:autofill` - Autofill API endpoints
 - `area:brand-templates` - Brand Templates API endpoints
@@ -158,18 +158,19 @@ We use a structured labeling system to organize GitHub issues:
 - `area:client` - Core HTTP client functionality
 - `area:auth` - Authentication and OAuth flows
 - `area:errors` - Error handling and types
+- `area:project` - Project configuration and meta files
 
 **Priority Labels:**
-- `priority:critical` - Critical issues requiring immediate attention
-- `priority:high` - High priority issues for next release
-- `priority:medium` - Medium priority issues for future releases
-- `priority:low` - Low priority issues and nice-to-haves
+- `priority:critical` - Critical issues requiring immediate attention (dark red #b60205)
+- `priority:high` - High priority issues for next release (red #d93f0b)
+- `priority:medium` - Medium priority issues for future releases (yellow #fbca04)
+- `priority:low` - Low priority issues and nice-to-haves (green #0e8a16)
 
 **Status Labels:**
-- `status:blocked` - Issues blocked by external dependencies
-- `status:in-progress` - Issues currently being worked on
-- `status:needs-review` - Issues ready for review
-- `status:good-first-issue` - Good for new contributors
+- `status:blocked` - Issues blocked by external dependencies (purple #6f42c1)
+- `status:in-progress` - Issues currently being worked on (dark blue #0052cc)
+- `status:needs-review` - Issues ready for review (blue #0075ca)
+- `status:good-first-issue` - Good for new contributors (purple #7057ff)
 
 ### Issue Creation Guidelines
 When creating issues:
