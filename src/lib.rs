@@ -106,92 +106,193 @@
 //! ### Asset Upload from File
 //!
 //! ```rust,no_run
-//! use canva_connect::{Client, auth::AccessToken, endpoints::assets::AssetUploadMetadata};
+//! use canva_connect::{Client, auth::AccessToken};
+//! use canva_connect::endpoints::assets::AssetUploadMetadata;
+//! use std::fs;
 //!
-//! # #[tokio::main]
-//! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let client = Client::new(AccessToken::new("token"))
-//!     .expect("Failed to create client");
-//!
-//! // Upload an asset
-//! let metadata = AssetUploadMetadata::new("logo.png", vec!["branding".to_string()]);
-//! let job = client.assets().create_upload_job(vec![], metadata).await?;
-//!
-//! // Wait for completion
-//! let completed_job = client.assets().wait_for_upload_job(&job.id).await?;
-//! println!("Asset uploaded: {:?}", completed_job);
-//! # Ok(())
-//! # }
+//! #[tokio::main]
+//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let client = Client::new(AccessToken::new("your-access-token"))?;
+//!     
+//!     // Read file
+//!     let file_data = fs::read("image.png")?;
+//!     
+//!     // Upload asset
+//!     let metadata = AssetUploadMetadata::new("My Image", vec!["rust".to_string(), "upload".to_string()]);
+//!     
+//!     let upload_job = client.assets().create_upload_job(file_data, metadata).await?;
+//!     let result = client.assets().wait_for_upload_job(&upload_job.id).await?;
+//!     
+//!     println!("Uploaded asset: {}", result.id);
+//!     Ok(())
+//! }
 //! ```
 //!
 //! ### Asset Upload from URL
 //!
 //! ```rust,no_run
-//! use canva_connect::{Client, auth::AccessToken, endpoints::assets::CreateUrlAssetUploadJobRequest};
-//!
-//! # #[tokio::main]
-//! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let client = Client::new(AccessToken::new("token"))
-//!     .expect("Failed to create client");
-//!
-//! // Upload from URL
-//! let request = CreateUrlAssetUploadJobRequest {
-//!     url: "https://example.com/image.png".to_string(),
-//!     name: "My Image".to_string(),
-//! };
-//! let job = client.assets().create_url_upload_job(request).await?;
-//! # Ok(())
-//! # }
-//! ```
-//!
-//! ### Create a Design
-//!
-//! ```rust,no_run
 //! use canva_connect::{Client, auth::AccessToken};
-//! use canva_connect::models::{CreateDesignRequest, DesignTypeInput, PresetDesignTypeName};
+//! use canva_connect::endpoints::assets::CreateUrlAssetUploadJobRequest;
 //!
-//! # #[tokio::main]
-//! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let client = Client::new(AccessToken::new("token"))
-//!     .expect("Failed to create client");
-//!
-//! // Create a presentation design
-//! let request = CreateDesignRequest {
-//!     design_type: Some(DesignTypeInput::Preset {
-//!         name: PresetDesignTypeName::Presentation,
-//!     }),
-//!     title: Some("My Presentation".to_string()),
-//!     asset_id: None,
-//! };
-//! let design = client.designs().create(request).await?;
-//! println!("Created design: {}", design.design.id);
-//! # Ok(())
-//! # }
+//! #[tokio::main]
+//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let client = Client::new(AccessToken::new("your-access-token"))?;
+//!     
+//!     let request = CreateUrlAssetUploadJobRequest {
+//!         url: "https://example.com/image.png".to_string(),
+//!         name: "Image from URL".to_string(),
+//!     };
+//!     
+//!     let upload_job = client.assets().create_url_upload_job(request).await?;
+//!     let result = client.assets().wait_for_url_upload_job(&upload_job.id).await?;
+//!     
+//!     println!("Uploaded asset: {}", result.id);
+//!     Ok(())
+//! }
 //! ```
 //!
-//! ### Get User Profile
+//! ### Get Asset Details
 //!
 //! ```rust,no_run
 //! use canva_connect::{Client, auth::AccessToken};
 //!
-//! # #[tokio::main]
-//! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let client = Client::new(AccessToken::new("token"))
-//!     .expect("Failed to create client");
+//! #[tokio::main]
+//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let client = Client::new(AccessToken::new("your-access-token"))?;
+//!     
+//!     // Get a specific asset by ID
+//!     let asset = client.assets().get("asset-id").await?;
+//!     println!("Asset: {} ({})", asset.name, asset.id);
+//!     
+//!     // Update asset metadata
+//!     let update_request = canva_connect::endpoints::assets::UpdateAssetRequest {
+//!         name: Some("Updated Asset Name".to_string()),
+//!         tags: Some(vec!["rust".to_string(), "api".to_string()]),
+//!     };
+//!     
+//!     let updated_asset = client.assets().update("asset-id", update_request).await?;
+//!     println!("Updated asset: {}", updated_asset.name);
+//!     
+//!     Ok(())
+//! }
+//! ```
 //!
-//! // Get user profile
-//! let profile = client.user().get_profile().await?;
-//! println!("User: {}", profile.display_name);
-//! # Ok(())
-//! # }
+//! ### Create and Manage Folders
+//!
+//! ```rust,no_run
+//! use canva_connect::{Client, auth::AccessToken};
+//! use canva_connect::endpoints::folders::{CreateFolderRequest, UpdateFolderRequest, MoveFolderItemRequest};
+//!
+//! #[tokio::main]
+//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let client = Client::new(AccessToken::new("your-access-token"))?;
+//!     
+//!     // Create a folder
+//!     let create_request = CreateFolderRequest {
+//!         name: "My Project".to_string(),
+//!         parent_folder_id: "root".to_string(),
+//!     };
+//!     
+//!     let folder_response = client.folders().create_folder(&create_request).await?;
+//!     let folder = &folder_response.folder;
+//!     println!("Created folder: {} (ID: {})", folder.name, folder.id);
+//!     
+//!     // List folder contents
+//!     let list_request = canva_connect::endpoints::folders::ListFolderItemsRequest {
+//!         limit: Some(50),
+//!         continuation: None,
+//!     };
+//!     
+//!     let items = client.folders().list_folder_items(&folder.id, &list_request).await?;
+//!     println!("Found {} items in folder", items.items.len());
+//!     
+//!     Ok(())
+//! }
+//! ```
+//!
+//! ### Export Designs
+//!
+//! ```rust,no_run
+//! use canva_connect::{Client, auth::AccessToken};
+//! use canva_connect::endpoints::exports::CreateDesignExportJobRequest;
+//! use canva_connect::models::ExportFormat;
+//!
+//! #[tokio::main]
+//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let client = Client::new(AccessToken::new("your-access-token"))?;
+//!     
+//!     // Create export job
+//!     let export_request = CreateDesignExportJobRequest {
+//!         design_id: "design-id".to_string(),
+//!         format: ExportFormat::Png {
+//!             export_quality: None,
+//!             height: None,
+//!             width: None,
+//!             pages: None,
+//!         },
+//!     };
+//!     
+//!     let export_job = client.exports().create_design_export_job(&export_request).await?;
+//!     println!("Created export job: {}", export_job.job.id);
+//!     
+//!     // Get export job status
+//!     let job_status = client.exports().get_design_export_job(&export_job.job.id).await?;
+//!     println!("Export job status: {:?}", job_status.job.status);
+//!     
+//!     Ok(())
+//! }
+//! ```
+//!
+//! ### Error Handling
+//!
+//! ```rust,no_run
+//! use canva_connect::{Client, auth::AccessToken, Error};
+//!
+//! #[tokio::main]
+//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let client = Client::new(AccessToken::new("your-access-token"))?;
+//!         
+//!     match client.assets().get("invalid-id").await {
+//!         Ok(asset) => println!("Asset: {}", asset.name),
+//!         Err(Error::Api { code, message }) => {
+//!             println!("API error {}: {}", code, message);
+//!         }
+//!         Err(Error::Http(e)) => {
+//!             println!("HTTP error: {}", e);
+//!         }
+//!         Err(e) => {
+//!             println!("Other error: {}", e);
+//!         }
+//!     }
+//!     Ok(())
+//! }
+//! ```
+//!
+//! ### Rate Limiting
+//!
+//! ```rust,no_run
+//! use canva_connect::{Client, auth::AccessToken, rate_limit::ApiRateLimiter};
+//!
+//! #[tokio::main]
+//! async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     let access_token = AccessToken::new("your-access-token");
+//!     
+//!     // Create client with custom rate limiter
+//!     let rate_limiter = ApiRateLimiter::new(30); // 30 requests per minute
+//!     let client = Client::with_rate_limiter(access_token, rate_limiter)?;
+//!     
+//!     Ok(())
+//! }
 //! ```
 //!
 //! For more comprehensive examples, see the `examples/` directory in the repository:
 //! - [`examples/asset_upload.rs`] - File-based asset upload with progress tracking
 //! - [`examples/url_asset_upload.rs`] - URL-based asset upload with metadata updates
 //! - [`examples/user_profile.rs`] - User profile and capabilities demonstration
+//! - [`examples/designs.rs`] - Create and manage designs with various templates
+//! - [`examples/folders.rs`] - Create and organize content in folders
+//! - [`examples/exports.rs`] - Export designs to various formats
 //! - [`examples/observability.rs`] - OpenTelemetry tracing integration
-//! - Design examples (coming soon) - Create and manage designs with various templates
 
 pub mod auth;
 pub mod client;
