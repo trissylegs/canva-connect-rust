@@ -158,6 +158,67 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+### Create and Manage Folders
+
+```rust,skt-connect,no_run
+use canva_connect::{Client, auth::AccessToken};
+use canva_connect::endpoints::folders::{CreateFolderRequest, UpdateFolderRequest, MoveFolderItemRequest};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new(AccessToken::new("your-access-token"));
+    
+    // Create a folder
+    let create_request = CreateFolderRequest {
+        name: "My Project".to_string(),
+        parent_folder_id: "root".to_string(),
+    };
+    
+    let folder_response = client.folders().create_folder(&create_request).await?;
+    let folder = &folder_response.folder;
+    println!("Created folder: {} (ID: {})", folder.name, folder.id);
+    
+    // List folder contents
+    let list_request = canva_connect::endpoints::folders::ListFolderItemsRequest {
+        limit: Some(50),
+        continuation: None,
+    };
+    
+    let items = client.folders().list_folder_items(&folder.id, &list_request).await?;
+    println!("Found {} items in folder", items.items.len());
+    
+    Ok(())
+}
+```
+
+### Export Designs
+
+```rust,skt-connect,no_run
+use canva_connect::{Client, auth::AccessToken};
+use canva_connect::endpoints::exports::{CreateExportJobRequest, ExportFormat};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new(AccessToken::new("your-access-token"));
+    
+    // Create export job
+    let export_request = CreateExportJobRequest {
+        design_id: "design-id".to_string(),
+        format: ExportFormat::Png,
+        quality: Some("high".to_string()),
+    };
+    
+    let export_job = client.exports().create_export_job(&export_request).await?;
+    println!("Created export job: {}", export_job.id);
+    
+    // Wait for completion
+    let result = client.exports().wait_for_export_job(&export_job.id).await?;
+    println!("Export completed: {}", result.export_url);
+    
+    Ok(())
+}
+```
+
 ## Running Examples
 
 This crate includes several examples that demonstrate how to use the library.
@@ -188,7 +249,22 @@ This crate includes several examples that demonstrate how to use the library.
    
    # Design management (list, create, get)
    cargo run --example designs
-   ```
+   
+    # Folder organization (create, update, list, move)
+    cargo run --example folders
+    
+    # Brand template operations
+    cargo run --example brand_templates
+    
+    # Autofill brand templates with data
+    cargo run --example autofill
+    
+    # Comment threads and replies
+    cargo run --example comments
+    
+    # Export designs to various formats
+    cargo run --example exports
+    ```
 
 ### Alternative: Command Line Arguments
 
@@ -225,12 +301,33 @@ Currently implemented endpoints:
 - ✅ Get user capabilities
 - ✅ Get user identification
 
-### Coming Soon
-- Folders API
-- Brand Templates API
-- Autofill API
-- Comments API
-- Exports API
+### Folders
+- ✅ Create folder
+- ✅ Get folder details
+- ✅ Update folder
+- ✅ List folder items
+- ✅ Move folder item
+
+### Brand Templates
+- ✅ List brand templates
+- ✅ Get brand template details
+- ✅ Get brand template datasets
+
+### Autofill
+- ✅ Create autofill job
+- ✅ Get autofill job status
+
+### Comments
+- ✅ Create comment thread
+- ✅ Get comment thread
+- ✅ Create comment reply
+- ✅ Get comment reply
+- ✅ List comment replies
+
+### Exports
+- ✅ Create export job
+- ✅ Get export job status
+- ✅ Get export formats
 
 ## Error Handling
 

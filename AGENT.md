@@ -26,8 +26,12 @@
 **Available examples for all APIs:**
 - `asset_upload` - Upload files as assets
 - `url_asset_upload` - Upload assets from URLs  
+- `autofill` - Autofill brand templates with data
+- `brand_templates` - List and get brand template details
+- `comments` - Create comment threads and replies
 - `designs` - Create and manage designs
-- `folders` - Create and organize content in folders
+- `exports` - Export designs to various formats
+- `folders` - Create and organize content in folders (demonstrates all folder operations)
 - `user_profile` - Get user information and capabilities
 - `observability` - Demonstrate tracing integration (requires `observability` feature)
 
@@ -122,6 +126,7 @@ Individual commands:
 
 ## API Design Patterns
 - **Tagged Unions (oneOf)**: The Canva API uses oneOf patterns with discriminator fields. In Rust, model these as enums with `#[serde(tag = "type", rename_all = "snake_case")]` instead of separate structs with explicit type fields. For example, `DesignTypeInput` is a tagged union with `Preset` and `Custom` variants where serde automatically handles the `type` discriminator field.
+- **Summary vs Full Models**: Some APIs return different levels of detail. Use separate `Summary` structs for listings (e.g., `DesignSummary` in `FolderItemSummary`) and full structs for detailed responses (e.g., `Design` from get endpoints). This prevents deserialization errors when optional fields like `owner` are missing in summary responses.
 
 ## OAuth Scopes Required by APIs
 Different APIs require different OAuth scopes. Here's a quick reference:
