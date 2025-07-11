@@ -32,30 +32,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     // Get file path from .env file, command line arguments, or prompt
-    let file_path = if let Ok(path) = env::var("EXAMPLE_FILE_PATH") {
-        path
-    } else {
-        // Parse command line arguments for file path
-        let args: Vec<String> = env::args().collect();
-
-        let mut file_path = None;
-        let mut i = 1;
-        while i < args.len() {
-            if args[i] == "--file" && i + 1 < args.len() {
-                file_path = Some(args[i + 1].clone());
-                break;
-            }
-            i += 1;
-        }
-
-        file_path.unwrap_or_else(|| {
-            eprintln!("Error: File path not found.");
-            eprintln!("Please either:");
-            eprintln!("1. Set EXAMPLE_FILE_PATH in .env file, or");
-            eprintln!("2. Use: cargo run --example asset_upload -- --file path/to/image.png");
-            std::process::exit(1);
-        })
-    };
+    let file_path = env::var("EXAMPLE_FILE_PATH").unwrap_or_else(|_| {
+        eprintln!("ℹ️  Using default image: rustacean-flat-noshadow.png");
+        eprintln!("💡 To use a custom file, set EXAMPLE_FILE_PATH in your .env file");
+        "rustacean-flat-noshadow.png".to_string()
+    });
 
     // Create the client
     let client =

@@ -56,7 +56,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map_err(|_| "CANVA_ACCESS_TOKEN environment variable not set")?;
 
     // Get URL from command line arguments or environment
-    let image_url = get_image_url_from_args_or_env()?;
+    let image_url = get_image_url_from_env()?;
 
     println!("🌐 Canva Connect API - URL Asset Upload Example");
     println!("================================================");
@@ -203,39 +203,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-/// Extract command line arguments or environment variable for image URL
-fn get_image_url_from_args_or_env() -> Result<String, Box<dyn std::error::Error>> {
-    // First try environment variable
+/// Extract image URL from environment variable or use default
+fn get_image_url_from_env() -> Result<String, Box<dyn std::error::Error>> {
+    // Try environment variable first
     if let Ok(url) = env::var("IMAGE_URL") {
         return Ok(url);
     }
 
-    // Then try command line arguments
-    let args: Vec<String> = env::args().collect();
-
-    let mut i = 1;
-    while i < args.len() {
-        if args[i] == "--url" && i + 1 < args.len() {
-            return Ok(args[i + 1].clone());
-        }
-        i += 1;
-    }
-
-    // Show help if no URL provided
-    eprintln!("❌ No image URL provided!");
-    eprintln!();
-    eprintln!("Usage:");
-    eprintln!("  cargo run --example url_asset_upload -- --url \"https://rustacean.net/assets/rustacean-flat-happy.png\"");
-    eprintln!();
-    eprintln!("Or set environment variable:");
-    eprintln!("  IMAGE_URL=\"https://rustacean.net/assets/rustacean-flat-happy.png\"");
+    // Use default Rustacean image
+    let default_url = "https://rustacean.net/assets/rustacean-flat-happy.png";
+    eprintln!("ℹ️  Using default image: {default_url}");
+    eprintln!("💡 To use a custom URL, set IMAGE_URL in your .env file");
     eprintln!();
     eprintln!("Example Rustacean URLs to try:");
     eprintln!("  https://rustacean.net/assets/rustacean-flat-happy.png");
     eprintln!("  https://rustacean.net/assets/rustacean-flat-gesture.png");
     eprintln!("  https://rustacean.net/assets/cuddlyferris.png");
 
-    Err("No image URL provided".into())
+    Ok(default_url.to_string())
 }
 
 /// Extract filename from URL, with fallback
