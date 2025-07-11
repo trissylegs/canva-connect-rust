@@ -37,6 +37,8 @@ governor = "0.6"
 nonzero_ext = "0.3"
 urlencoding = "2.1"
 dotenv = "0.15"
+hyper = { version = "0.14", features = ["full"] }
+webbrowser = "0.8"
 
 # Observability dependencies (optional)
 opentelemetry = { version = "0.21", optional = true }

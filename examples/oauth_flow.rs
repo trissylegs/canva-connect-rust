@@ -9,13 +9,20 @@
 //! This example shows:
 //! - How to generate PKCE parameters
 //! - How to create an authorization URL with PKCE
+//! - How to run a local HTTP server to receive the OAuth callback
 //! - How to exchange authorization code for access token using PKCE
 //!
-//! Note: This example requires manual interaction as it involves browser redirects
-//! and authorization code handling.
+//! The example starts a local HTTP server on 127.0.0.1:8080 to automatically
+//! receive the OAuth callback and complete the flow.
 
 use canva_connect::auth::{OAuthClient, OAuthConfig, Scope};
-use std::io::{self, Write};
+use hyper::service::{make_service_fn, service_fn};
+use hyper::{Body, Method, Request, Response, Server, StatusCode};
+use std::collections::HashMap;
+use std::convert::Infallible;
+use std::sync::Arc;
+use tokio::sync::oneshot;
+use url::Url;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -31,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client_secret =
         std::env::var("CANVA_CLIENT_SECRET").unwrap_or_else(|_| "your-client-secret".to_string());
     let redirect_uri = std::env::var("CANVA_REDIRECT_URI")
-        .unwrap_or_else(|_| "http://localhost:8080/callback".to_string());
+        .unwrap_or_else(|_| "http://127.0.0.1:8080/callback".to_string());
 
     // Create OAuth configuration
     let config = OAuthConfig::new(
@@ -64,29 +71,72 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("{auth_url}");
     println!();
 
+    println!("🚀 Starting local HTTP server on 127.0.0.1:8080...");
     println!("📋 Next Steps:");
-    println!("1. Open the authorization URL in your browser");
-    println!("2. Grant permissions to your application");
-    println!("3. Copy the authorization code from the redirect URL");
-    println!("4. Enter the code below to exchange it for an access token");
+    println!("1. The server is now running and waiting for OAuth callback");
+    println!("2. Open the authorization URL above in your browser");
+    println!("3. Grant permissions to your application");
+    println!("4. You'll be redirected back and the flow will complete automatically");
     println!();
 
-    // Get authorization code from user
-    print!("Enter the authorization code: ");
-    io::stdout().flush()?;
-    let mut auth_code = String::new();
-    io::stdin().read_line(&mut auth_code)?;
-    let auth_code = auth_code.trim();
+    // Channel to receive the authorization code
+    let (tx, rx) = oneshot::channel();
+    let tx = Arc::new(tokio::sync::Mutex::new(Some(tx)));
 
-    if auth_code.is_empty() {
-        println!("❌ No authorization code provided");
-        return Ok(());
+    // Create the HTTP service
+    let make_svc = make_service_fn(move |_conn| {
+        let tx = tx.clone();
+        async move {
+            Ok::<_, Infallible>(service_fn(move |req| {
+                let tx = tx.clone();
+                handle_request(req, tx)
+            }))
+        }
+    });
+
+    // Start the server
+    let addr = ([127, 0, 0, 1], 8080).into();
+    let server = Server::bind(&addr).serve(make_svc);
+
+    // Start the server and wait for the OAuth callback
+    println!("⏳ Waiting for OAuth callback...");
+    println!("💡 If your browser doesn't open automatically, copy and paste the URL above");
+    println!();
+
+    // Try to open the URL in the default browser
+    if let Err(e) = webbrowser::open(&auth_url) {
+        println!("⚠️  Could not open browser automatically: {e}");
+        println!("📋 Please manually open the URL above in your browser");
     }
 
+    // Wait for the callback using select to handle both server and receiver
+    let auth_code = tokio::select! {
+        result = rx => {
+            match result {
+                Ok(code) => {
+                    println!("🔄 OAuth callback received, processing...");
+                    code
+                }
+                Err(_) => {
+                    println!("❌ Failed to receive authorization code");
+                    return Ok(());
+                }
+            }
+        }
+        result = server => {
+            if let Err(e) = result {
+                println!("❌ Server error: {e}");
+            }
+            return Ok(());
+        }
+    };
+
+    println!("✅ Authorization code received!");
+    println!("🔄 Exchanging authorization code for access token...");
+
     // Exchange code for access token using PKCE
-    println!("\n🔄 Exchanging authorization code for access token...");
     match client
-        .exchange_code_with_pkce(auth_code, Some(&pkce_params))
+        .exchange_code_with_pkce(&auth_code, Some(&pkce_params))
         .await
     {
         Ok(token_response) => {
@@ -109,4 +159,128 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("💡 The access token can now be used to authenticate API requests");
 
     Ok(())
+}
+
+async fn handle_request(
+    req: Request<Body>,
+    tx: Arc<tokio::sync::Mutex<Option<oneshot::Sender<String>>>>,
+) -> Result<Response<Body>, Infallible> {
+    match (req.method(), req.uri().path()) {
+        (&Method::GET, "/callback") => {
+            // Parse query parameters
+            let query = req.uri().query().unwrap_or("");
+            let params: HashMap<String, String> =
+                Url::parse(&format!("http://example.com?{query}"))
+                    .unwrap()
+                    .query_pairs()
+                    .into_owned()
+                    .collect();
+
+            if let Some(code) = params.get("code") {
+                // Send the authorization code through the channel
+                let mut tx_guard = tx.lock().await;
+                if let Some(sender) = tx_guard.take() {
+                    let _ = sender.send(code.clone());
+                }
+
+                // Return success page
+                let html = r#"
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>OAuth Success</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                        .success { color: #4CAF50; }
+                        .container { max-width: 600px; margin: 0 auto; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h1 class="success">✅ Authorization Successful!</h1>
+                        <p>You have successfully authorized the application.</p>
+                        <p>The authorization code has been received and the token exchange is in progress.</p>
+                        <p>You can close this window and return to the terminal.</p>
+                    </div>
+                </body>
+                </html>
+                "#;
+
+                Ok(Response::builder()
+                    .status(StatusCode::OK)
+                    .header("Content-Type", "text/html")
+                    .body(Body::from(html))
+                    .unwrap())
+            } else if let Some(error) = params.get("error") {
+                // Handle OAuth error
+                let default_error = "Unknown error".to_string();
+                let error_description = params.get("error_description").unwrap_or(&default_error);
+
+                let html = format!(
+                    r#"
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>OAuth Error</title>
+                        <style>
+                            body {{ font-family: Arial, sans-serif; text-align: center; padding: 50px; }}
+                            .error {{ color: #f44336; }}
+                            .container {{ max-width: 600px; margin: 0 auto; }}
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h1 class="error">❌ Authorization Failed</h1>
+                            <p>Error: {error}</p>
+                            <p>Description: {error_description}</p>
+                            <p>Please try again or check your OAuth configuration.</p>
+                        </div>
+                    </body>
+                    </html>
+                    "#
+                );
+
+                Ok(Response::builder()
+                    .status(StatusCode::BAD_REQUEST)
+                    .header("Content-Type", "text/html")
+                    .body(Body::from(html))
+                    .unwrap())
+            } else {
+                // Missing required parameters
+                let html = r#"
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>OAuth Error</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                        .error { color: #f44336; }
+                        .container { max-width: 600px; margin: 0 auto; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h1 class="error">❌ Invalid Callback</h1>
+                        <p>The OAuth callback is missing required parameters.</p>
+                        <p>Please check your OAuth configuration and try again.</p>
+                    </div>
+                </body>
+                </html>
+                "#;
+
+                Ok(Response::builder()
+                    .status(StatusCode::BAD_REQUEST)
+                    .header("Content-Type", "text/html")
+                    .body(Body::from(html))
+                    .unwrap())
+            }
+        }
+        _ => {
+            // Handle other routes
+            Ok(Response::builder()
+                .status(StatusCode::NOT_FOUND)
+                .body(Body::from("Not Found"))
+                .unwrap())
+        }
+    }
 }
