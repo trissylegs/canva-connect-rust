@@ -228,7 +228,13 @@ mod tests {
 
         assert_eq!(request.design_id, "design_456");
         match request.format {
-            ExportFormat::Jpg { quality, height, width, pages, .. } => {
+            ExportFormat::Jpg {
+                quality,
+                height,
+                width,
+                pages,
+                ..
+            } => {
                 assert_eq!(quality, 85);
                 assert_eq!(height, Some(1080));
                 assert_eq!(width, Some(1920));
@@ -314,21 +320,23 @@ mod tests {
         assert!(options.jpg.is_some());
         assert!(options.png.is_some());
         assert!(options.svg.is_none());
-        assert_eq!(options.pdf.unwrap().available, true);
-        assert_eq!(options.png.unwrap().available, false);
+        assert!(options.pdf.expect("PDF option should be present").available);
+        assert!(!options.png.expect("PNG option should be present").available);
     }
 
     #[test]
     fn test_export_format_options_deserialization() {
-        let json = r#"{"pdf":{"available":true},"jpg":{"available":false},"png":{"available":true}}"#;
-        let options: ExportFormatOptions = serde_json::from_str(json).expect("Failed to deserialize");
+        let json =
+            r#"{"pdf":{"available":true},"jpg":{"available":false},"png":{"available":true}}"#;
+        let options: ExportFormatOptions =
+            serde_json::from_str(json).expect("Failed to deserialize");
 
         assert!(options.pdf.is_some());
         assert!(options.jpg.is_some());
         assert!(options.png.is_some());
-        assert_eq!(options.pdf.unwrap().available, true);
-        assert_eq!(options.jpg.unwrap().available, false);
-        assert_eq!(options.png.unwrap().available, true);
+        assert!(options.pdf.expect("PDF option should be present").available);
+        assert!(!options.jpg.expect("JPG option should be present").available);
+        assert!(options.png.expect("PNG option should be present").available);
     }
 
     #[test]
@@ -394,7 +402,10 @@ mod tests {
         };
 
         match request.format {
-            ExportFormat::Mp4 { export_quality, pages } => {
+            ExportFormat::Mp4 {
+                export_quality,
+                pages,
+            } => {
                 assert_eq!(export_quality, Some(ExportQuality::Pro));
                 assert_eq!(pages, Some(vec![1, 2, 3, 4, 5]));
             }
@@ -413,7 +424,10 @@ mod tests {
         };
 
         match request.format {
-            ExportFormat::Gif { export_quality, pages } => {
+            ExportFormat::Gif {
+                export_quality,
+                pages,
+            } => {
                 assert_eq!(export_quality, Some(ExportQuality::Regular));
                 assert_eq!(pages, None);
             }
@@ -432,7 +446,10 @@ mod tests {
         };
 
         match request.format {
-            ExportFormat::Pptx { export_quality, pages } => {
+            ExportFormat::Pptx {
+                export_quality,
+                pages,
+            } => {
                 assert_eq!(export_quality, None);
                 assert_eq!(pages, Some(vec![1, 3, 5]));
             }
@@ -462,13 +479,18 @@ mod tests {
         assert!(options.mp4.is_some());
 
         // Test availability flags
-        assert!(options.pdf.unwrap().available);
-        assert!(options.jpg.unwrap().available);
-        assert!(options.png.unwrap().available);
-        assert!(!options.svg.unwrap().available);
-        assert!(options.pptx.unwrap().available);
-        assert!(!options.gif.unwrap().available);
-        assert!(options.mp4.unwrap().available);
+        assert!(options.pdf.expect("PDF option should be present").available);
+        assert!(options.jpg.expect("JPG option should be present").available);
+        assert!(options.png.expect("PNG option should be present").available);
+        assert!(!options.svg.expect("SVG option should be present").available);
+        assert!(
+            options
+                .pptx
+                .expect("PPTX option should be present")
+                .available
+        );
+        assert!(!options.gif.expect("GIF option should be present").available);
+        assert!(options.mp4.expect("MP4 option should be present").available);
     }
 
     #[test]
