@@ -23,17 +23,25 @@
 - `cargo run --example asset_upload -- --file path/to/file` - Run with custom file path
 - `cargo run --example url_asset_upload -- --url "https://rustacean.net/assets/rustacean-flat-happy.png"` - Run with custom URL
 
-**Available examples for all APIs:**
-- `asset_upload` - Upload files as assets
-- `url_asset_upload` - Upload assets from URLs  
-- `autofill` - Autofill brand templates with data
-- `brand_templates` - List and get brand template details
-- `comments` - Create comment threads and replies
-- `designs` - Create and manage designs
-- `exports` - Export designs to various formats
-- `folders` - Create and organize content in folders (demonstrates all folder operations)
-- `user_profile` - Get user information and capabilities
+**Complete Examples for All 34 API Endpoints:**
+- `asset_upload` - Upload files as assets (3 endpoints: create_upload_job, get_upload_job, wait_for_upload_job)
+- `url_asset_upload` - Upload assets from URLs (3 endpoints: create_url_upload_job, get_url_upload_job, wait_for_url_upload_job)
+- `autofill` - Autofill brand templates with data (3 endpoints: create_autofill_job, get_autofill_job, wait_for_autofill_job)
+- `brand_templates` - List and get brand template details (3 endpoints: list, get, get_dataset)
+- `comments` - Create comment threads and replies (5 endpoints: create_thread, get_thread, create_reply, get_reply, list_replies)
+- `designs` - Create and manage designs (3 endpoints: list, get, create)
+- `exports` - Export designs to various formats (3 endpoints: create_design_export_job, get_design_export_job, get_design_export_formats)
+- `folders` - Create and organize content in folders (5 endpoints: create_folder, get_folder, update_folder, list_folder_items, move_folder_item)
+- `user_profile` - Get user information and capabilities (3 endpoints: get_me, get_profile, get_capabilities)
 - `observability` - Demonstrate tracing integration (requires `observability` feature)
+
+**Debug Logging:**
+All examples include debug logging support using `env_logger`. Enable with:
+```bash
+RUST_LOG=debug cargo run --example <example_name>
+```
+
+This shows HTTP requests, response status codes, and timing information for debugging API interactions.
 
 ## Documentation Testing
 - `cargo test --test skeptic` - Test README.md code examples with skeptic (currently has dependency resolution issues)
