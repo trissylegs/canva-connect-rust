@@ -7,13 +7,13 @@
 //! ## Available Endpoints
 //!
 //! - [`assets`] - Upload, manage, and retrieve design assets
+//! - [`autofill`] - Use autofill functionality with brand templates and data
+//! - [`brand_templates`] - Work with brand templates and datasets
+//! - [`comments`] - Add and manage comments and threads on designs
 //! - [`designs`] - Create and manage Canva designs
+//! - [`exports`] - Export designs to various file formats
+//! - [`folders`] - Organize content in folders
 //! - [`user`] - User profile and account information
-//! - Folders - Organize content in folders (coming soon)
-//! - Brand Templates - Work with brand templates (coming soon)
-//! - Autofill - Use autofill functionality (coming soon)
-//! - Comments - Add and manage comments (coming soon)
-//! - Exports - Export designs to various formats (coming soon)
 //!
 //! ## Usage
 //!
@@ -33,34 +33,21 @@
 //! ```
 
 pub mod assets;
+pub mod autofill;
+pub mod brand_templates;
+pub mod comments;
 pub mod designs;
+pub mod exports;
+pub mod folders;
 pub mod user;
 
 pub use assets::AssetsApi;
+pub use autofill::AutofillApi;
+pub use brand_templates::BrandTemplatesApi;
+pub use comments::CommentsApi;
 pub use designs::DesignsApi;
+pub use exports::ExportsApi;
+pub use folders::FoldersApi;
 pub use user::UserApi;
 
-// Stub implementations for other endpoints
-use crate::client::Client;
-
-macro_rules! stub_api {
-    ($name:ident) => {
-        #[derive(Debug, Clone)]
-        pub struct $name {
-            #[allow(dead_code)]
-            client: Client,
-        }
-
-        impl $name {
-            pub fn new(client: Client) -> Self {
-                Self { client }
-            }
-        }
-    };
-}
-
-stub_api!(AutofillApi);
-stub_api!(BrandTemplatesApi);
-stub_api!(CommentsApi);
-stub_api!(ExportsApi);
-stub_api!(FoldersApi);
+// All endpoints are now implemented

@@ -493,11 +493,174 @@ pub struct ExportUrl {
     pub url: String,
 }
 
+/// Export job containing status and results
+pub type ExportJob = Job<ExportResult>;
+
+/// Folder item (design, asset, etc.)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FolderItem {
+    /// Item ID
+    pub id: String,
+    /// Item type (design, asset, etc.)
+    pub item_type: String,
+    /// Item name
+    pub name: String,
+    /// Item thumbnail (if available)
+    pub thumbnail: Option<Thumbnail>,
+    /// When the item was created (Unix timestamp)
+    pub created_at: i64,
+    /// When the item was last updated (Unix timestamp)
+    pub updated_at: i64,
+}
+
 /// Autofill job result
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AutofillResult {
     /// Created design
     pub design: Design,
+}
+
+/// Request to create a design autofill job
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateDesignAutofillJobRequest {
+    /// ID of the input brand template
+    pub brand_template_id: String,
+    /// Title to use for the autofilled design
+    pub title: Option<String>,
+    /// Data object containing the data fields and values to autofill
+    pub data: HashMap<String, DatasetValue>,
+}
+
+/// Response from creating a design autofill job
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateDesignAutofillJobResponse {
+    /// The autofill job
+    pub job: DesignAutofillJob,
+}
+
+/// Response from getting a design autofill job
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GetDesignAutofillJobResponse {
+    /// The autofill job
+    pub job: DesignAutofillJob,
+}
+
+/// Details about the autofill job
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DesignAutofillJob {
+    /// ID of the asynchronous job
+    pub id: String,
+    /// Status of the design autofill job
+    pub status: DesignAutofillStatus,
+    /// Result of the design autofill job (present when status is success)
+    pub result: Option<DesignAutofillJobResult>,
+    /// Error details (present when status is failed)
+    pub error: Option<AutofillError>,
+}
+
+/// Status of the design autofill job
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DesignAutofillStatus {
+    /// Job is still in progress
+    InProgress,
+    /// Job completed successfully
+    Success,
+    /// Job failed
+    Failed,
+}
+
+/// Result of the design autofill job
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum DesignAutofillJobResult {
+    /// Design has been created and saved to user's root folder
+    CreateDesign {
+        /// The created design
+        design: Design,
+    },
+}
+
+/// If the autofill job fails, this object provides details about the error
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AutofillError {
+    /// Error code
+    pub code: AutofillErrorCode,
+    /// A human-readable description of what went wrong
+    pub message: String,
+}
+
+/// Autofill error codes
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AutofillErrorCode {
+    /// General autofill error
+    AutofillError,
+    /// Thumbnail generation error
+    ThumbnailGenerationError,
+    /// Create design error
+    CreateDesignError,
+}
+
+/// The data field to autofill
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum DatasetValue {
+    /// Image data field
+    Image {
+        /// Asset ID of the image to insert
+        asset_id: String,
+    },
+    /// Text data field
+    Text {
+        /// Text to insert into the template element
+        text: String,
+    },
+    /// Chart data field (preview feature)
+    Chart {
+        /// Chart data
+        chart_data: DataTable,
+    },
+}
+
+/// Tabular data, structured in rows of cells
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DataTable {
+    /// Rows of data (first row usually contains column headers)
+    pub rows: Vec<DataTableRow>,
+}
+
+/// A single row of tabular data
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DataTableRow {
+    /// Cells of data in row (all rows must have the same number of cells)
+    pub cells: Vec<DataTableCell>,
+}
+
+/// A single tabular data cell
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum DataTableCell {
+    /// String data cell
+    String {
+        /// String value
+        value: Option<String>,
+    },
+    /// Number data cell
+    Number {
+        /// Number value
+        value: Option<f64>,
+    },
+    /// Boolean data cell
+    Boolean {
+        /// Boolean value
+        value: Option<bool>,
+    },
+    /// Date data cell (Unix timestamp in seconds)
+    Date {
+        /// Date value as Unix timestamp
+        value: Option<i64>,
+    },
 }
 
 /// Dataset filter
