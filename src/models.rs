@@ -534,7 +534,7 @@ pub enum ExportPageSize {
 }
 
 /// Export quality
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ExportQuality {
     /// Regular quality
