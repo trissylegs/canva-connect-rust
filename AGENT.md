@@ -214,6 +214,36 @@ When creating issues:
 4. Reference related files and line numbers
 5. For bugs, include reproduction steps and expected behavior
 
+### GitHub CLI Usage
+**Always use the GitHub CLI (`gh`) for GitHub operations instead of the web interface:**
+
+- **Create issues**: `gh issue create --title "Title" --label "type:feature,area:client" --body "Description"`
+- **List issues**: `gh issue list`
+- **View issue**: `gh issue view <issue_number>`
+- **Close issue**: `gh issue close <issue_number>`
+- **Create PR**: `gh pr create --title "Title" --body "Description"`
+- **List PRs**: `gh pr list`
+- **Check PR status**: `gh pr status`
+
+**Issue Creation Examples:**
+```bash
+# Feature request
+gh issue create --title "Add rate limiting to exports" --label "type:feature,area:exports,priority:medium" --body "Add configurable rate limiting..."
+
+# Bug report
+gh issue create --title "Asset upload fails for large files" --label "type:bug,area:assets,priority:high" --body "When uploading files > 10MB..."
+
+# Documentation
+gh issue create --title "Update OAuth documentation" --label "type:docs,area:auth,priority:low" --body "The current docs need updating..."
+```
+
+**Available Labels:**
+Use `gh label list` to see all available labels. Common combinations:
+- `type:feature,area:client,priority:medium`
+- `type:bug,area:assets,priority:high`  
+- `type:docs,area:auth,priority:low`
+- `type:testing,area:exports,priority:medium`
+
 ## API Design Patterns
 - **Tagged Unions (oneOf)**: The Canva API uses oneOf patterns with discriminator fields. In Rust, model these as enums with `#[serde(tag = "type", rename_all = "snake_case")]` instead of separate structs with explicit type fields. For example, `DesignTypeInput` is a tagged union with `Preset` and `Custom` variants where serde automatically handles the `type` discriminator field.
 - **Summary vs Full Models**: Some APIs return different levels of detail. Use separate `Summary` structs for listings (e.g., `DesignSummary` in `FolderItemSummary`) and full structs for detailed responses (e.g., `Design` from get endpoints). This prevents deserialization errors when optional fields like `owner` are missing in summary responses.
